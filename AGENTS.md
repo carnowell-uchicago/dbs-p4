@@ -67,8 +67,13 @@ The student also has to explain everything in class: request tracing, access con
 
 - **Tool / app idea:** _TBD (student decides in Step 1)_
 - **Extending Assignment 3, or starting new?** _TBD_
-- **External API:** _TBD_ (base URL, endpoints used, whether a key is needed)
-- **Sample response notes:** _TBD (fields we use; what an empty result looks like; error behavior)_
+- **External API:** PokéAPI, `https://pokeapi.co/api/v2/`. No key needed. Read-only (GET). Specific endpoints are TBD until the tool idea is chosen.
+- **Sample response notes** (checked 2026-10-20):
+  - `GET /pokemon/{name|id}` returns about 300 KB of JSON: `id`, `name`, `height` (decimetres), `weight` (hectograms), `types[]`, `abilities[]`, `stats[]` (hp/attack/defense/sp-atk/sp-def/speed), `sprites` (PNG URLs, including `other.official-artwork`), `cries` (`.ogg` URLs), `moves[]` (100+ entries), and `species` (a link to the `/pokemon-species` endpoint).
+  - `GET /pokemon-species/{name|id}` returns `flavor_text_entries` (Pokédex text, many languages and versions; contains `\n` and `\f` that need cleaning), `genera`, `is_legendary`/`is_mythical`, `habitat`, `color`, `evolution_chain` (link), and `generation`.
+  - `GET /pokemon?limit=N&offset=M` returns a paginated list of `{name, url}` (`count` is 1351).
+  - **Nothing found:** an unknown name returns **HTTP 404** with `{"status":404,"message":"Not Found"}`. There is **no partial or fuzzy search**: `pika` returns 404. A search UI needs the full name list (fetched once and cached) to filter against. The name lookup accepted `Pikachu`, but lowercase input before sending it anyway.
+  - Other resources: types, moves, abilities, items, berries, evolution chains, locations, regions, generations, natures, and Pokédexes.
 - **Where the API is called (browser vs. server) and why:** _TBD (Step 6)_
 - **GitHub repo URL:** https://github.com/carnowell-uchicago/dbs-p4 (remote `origin`)
 - **Vercel URL:** _TBD_
