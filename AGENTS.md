@@ -1,3 +1,13 @@
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
+
 # AGENTS.md: Assignment 4, Full Stack App
 
 **Course:** Design, Build, Ship (MPCS 51238), Autumn 2026
@@ -210,6 +220,7 @@ To help with #5, keep a short running log below. Record each time the student re
 
 ### Agentic workflow log
 - _(add entries as they happen: date, what the student stopped or caught, what changed)_
+- 2026-10-20: The student chose to do Step 4 (Clerk) before Steps 1–3. The agent pointed out that `clerk init` would scaffold into a subfolder of a "bare" directory, so the Next.js app was created at the repo root first. The student picked Clerk app `app_3Kyu70z56nAtnZonNsGQNtTOLgn` in the Clerk Dashboard. Steps 1–3 (idea, API, data model) still need to be done before any Supabase work.
 
 ---
 

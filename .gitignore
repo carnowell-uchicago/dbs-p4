@@ -27,6 +27,14 @@ blob-report/
 # course handout (instructor's material; kept locally, not published)
 Assignment 4.pdf
 
+# testing / build
+/coverage
+/build
+*.tsbuildinfo
+.pnp
+.pnp.*
+
 # misc
 .DS_Store
 *.log
+*.pem
