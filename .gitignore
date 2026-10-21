@@ -1,0 +1,32 @@
+# env files (keys live here; never commit)
+.env
+.env.*
+!.env.example
+
+# Claude Code local-only settings
+.claude/settings.local.json
+
+# dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+
+# Vercel
+.vercel
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+playwright/.auth/
+blob-report/
+
+# course handout (instructor's material; kept locally, not published)
+Assignment 4.pdf
+
+# misc
+.DS_Store
+*.log
