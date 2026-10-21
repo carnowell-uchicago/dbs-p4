@@ -74,6 +74,8 @@ The student also has to explain everything in class: request tracing, access con
   - `GET /pokemon?limit=N&offset=M` returns a paginated list of `{name, url}` (`count` is 1351).
   - **Nothing found:** an unknown name returns **HTTP 404** with `{"status":404,"message":"Not Found"}`. There is **no partial or fuzzy search**: `pika` returns 404. A search UI needs the full name list (fetched once and cached) to filter against. The name lookup accepted `Pikachu`, but lowercase input before sending it anyway.
   - Other resources: types, moves, abilities, items, berries, evolution chains, locations, regions, generations, natures, and Pokédexes.
+  - **Images:** `sprites` holds URLs on `raw.githubusercontent.com/PokeAPI/sprites/…`. Use `front_default` (~0.6 KB pixel sprite, good for lists) or `other.official-artwork.front_default` (~118 KB, good for detail views). Store only the URL or the Pokémon ID, not the image. If you use `next/image`, add `raw.githubusercontent.com` to `images.remotePatterns`. Show the Nintendo trademark credit in the footer.
+  - **PokéAPI fair use policy:** "Locally cache resources whenever you request them". Repeated calls get your IP permanently banned. Cache every PokéAPI response (the data almost never changes), and never call it in a loop without caching.
 - **Where the API is called (browser vs. server) and why:** _TBD (Step 6)_
 - **GitHub repo URL:** https://github.com/carnowell-uchicago/dbs-p4 (remote `origin`)
 - **Vercel URL:** _TBD_
