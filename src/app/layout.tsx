@@ -1,4 +1,13 @@
+import {
+  ClerkProvider,
+  Show,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+} from "@clerk/nextjs";
 import type { Metadata } from "next";
+import Link from "next/link";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -23,7 +32,38 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <ClerkProvider>
+          <header className="flex items-center justify-between border-b border-black/10 px-6 py-3 dark:border-white/15">
+            <Link href="/" className="font-semibold">
+              dbs-p4
+            </Link>
+            <Suspense fallback={<div className="h-8 w-40" aria-hidden />}>
+              <AuthControls />
+            </Suspense>
+          </header>
+          {children}
+        </ClerkProvider>
+      </body>
     </html>
+  );
+}
+
+// Reads the signed-in state per request, so it streams in behind Suspense.
+function AuthControls() {
+  return (
+    <nav className="flex items-center gap-3 text-sm">
+      <Show when="signed-out">
+        <SignInButton />
+        <SignUpButton>
+          <button className="rounded-full bg-foreground px-4 py-1.5 text-background">
+            Sign up
+          </button>
+        </SignUpButton>
+      </Show>
+      <Show when="signed-in">
+        <UserButton />
+      </Show>
+    </nav>
   );
 }
