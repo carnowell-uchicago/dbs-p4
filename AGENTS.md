@@ -66,7 +66,7 @@ The student also has to explain everything in class: request tracing, access con
 > Leave these blank until the student decides. Update this section as soon as a decision is made.
 
 - **Tool / app idea:** _TBD (student decides in Step 1)_
-- **Extending Assignment 3, or starting new?** _TBD_
+- **Extending Assignment 3, or starting new?** Starting a new project.
 - **External API:** PokéAPI, `https://pokeapi.co/api/v2/`. No key needed. Read-only (GET). Specific endpoints are TBD until the tool idea is chosen.
 - **Sample response notes** (checked 2026-10-20):
   - `GET /pokemon/{name|id}` returns about 300 KB of JSON: `id`, `name`, `height` (decimetres), `weight` (hectograms), `types[]`, `abilities[]`, `stats[]` (hp/attack/defense/sp-atk/sp-def/speed), `sprites` (PNG URLs, including `other.official-artwork`), `cries` (`.ogg` URLs), `moves[]` (100+ entries), and `species` (a link to the `/pokemon-species` endpoint).
