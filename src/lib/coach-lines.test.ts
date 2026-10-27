@@ -6,8 +6,7 @@ import {
   coachTypeFor,
   fillCoachLine,
   formatCoachHours,
-  pickCoachLine,
-} from "./coach-lines";
+  pickCoachLine, CLOCK_IN_CALLS, CLOCK_OUT_CALLS } from "./coach-lines";
 
 const ALLOWED_PLACEHOLDERS = ["{pokemon}", "{trainer}", "{hours}"];
 
@@ -50,17 +49,25 @@ describe("coachLines table", () => {
     }
   });
 
-  it("uses the anime phrases: 'I choose you!' to clock in, 'That's enough' to clock out", () => {
+  it("clock in and out are two parts: an anime/game call with the name, then a type message", () => {
+    for (const call of [...CLOCK_IN_CALLS, ...CLOCK_OUT_CALLS]) expect(call).toContain("{trainer}");
     for (const type of COACH_TYPES) {
-      for (const line of coachLines[type].clockIn) {
-        expect(line, `${type}.clockIn`).toMatch(/^\{trainer\}, I choose you! /);
+      for (let seed = 0; seed < 30; seed++) {
+        const inLine = pickCoachLine({ types: [type], event: "clockIn", seed });
+        const outLine = pickCoachLine({ types: [type], event: "clockOut", seed });
+        expect(CLOCK_IN_CALLS.some((c) => inLine.startsWith(`${c} `)), inLine).toBe(true);
+        expect(CLOCK_OUT_CALLS.some((c) => outLine.startsWith(`${c} `)), outLine).toBe(true);
       }
-      for (const line of coachLines[type].clockOut) {
-        expect(line, `${type}.clockOut`).toMatch(/^That's enough, \{trainer\}\. /);
-      }
-      // At least one clock-out line tells the trainer how long they worked.
+      // At least one clock-out message tells the trainer how long they worked.
       expect(coachLines[type].clockOut.some((line) => line.includes("{hours}h")), type).toBe(true);
     }
+  });
+
+  it("goes through every call and message combination", () => {
+    const seen = new Set<string>();
+    const combos = CLOCK_IN_CALLS.length * coachLines.fire.clockIn.length;
+    for (let seed = 0; seed < combos; seed++) seen.add(pickCoachLine({ types: ["fire"], event: "clockIn", seed }));
+    expect(seen.size).toBe(combos);
   });
 
   it("has no duplicate lines inside a type and event", () => {
