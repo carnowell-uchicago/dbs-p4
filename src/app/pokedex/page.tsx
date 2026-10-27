@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import { Button } from "@/components/ds/Button";
 import { focusRing } from "@/components/ds/classes";
 import { Field } from "@/components/ds/Field";
-import { Segmented } from "@/components/ds/Segmented";
 import { Skeleton } from "@/components/ds/Skeleton";
 import { Badge, TypeTag } from "@/components/ds/Tag";
 import { TextBox } from "@/components/ds/TextBox";
@@ -15,6 +14,7 @@ import { formatDay, formatDuration } from "@/lib/format";
 import { getOriginalPokedex, getPokemon, type PokedexEntry, type Pokemon } from "@/lib/pokeapi";
 import { searchPokedex, suggestName } from "@/lib/pokedex-search";
 import { spriteUrl } from "@/lib/sprites";
+import { ShowFilter } from "./ShowFilter";
 
 export const metadata: Metadata = { title: "Coach Pokédex · Trainer Timesheet" };
 
@@ -85,15 +85,7 @@ async function Pokedex({ searchParams }: { searchParams: Params }) {
     <div className="mt-5 flex flex-col gap-5">
       <form method="get" className={`${panel} flex flex-wrap items-end gap-4 p-4`}>
         <Field label="Search by name or number" name="q" defaultValue={q} placeholder="e.g. Pikachu or 25" maxLength={40} className="min-w-56 flex-1" />
-        <Segmented
-          label="Show"
-          name="show"
-          defaultValue={show}
-          options={[
-            { value: "all", label: "All 151" },
-            { value: "met", label: "Coached me" },
-          ]}
-        />
+        <ShowFilter show={show} />
         <Button type="submit">Search</Button>
       </form>
 
