@@ -65,10 +65,12 @@ The student also has to explain everything in class: request tracing, access con
 
 > Leave these blank until the student decides. Update this section as soon as a decision is made.
 
-- **Tool / app idea (chosen 2026-10-27):** a **remote-work hours log**, mainly for people who need to keep their own record of hours (it also works for study hours), themed as a Pokémon companion.
+- **Tool / app idea (chosen 2026-10-27):** a **remote-work hours log**, mainly for people who need to keep their own record of hours (it also works for study hours), themed as a Pokémon trainer being coached by a daily Pokémon.
   - **Clock in / clock out** must be fast and obvious: one primary action.
-  - **Daily Pokémon:** each day you log in, you get that day's Pokémon. It's the **same Pokémon for everyone that day**, drawn at random from the original Pokédex (**#1–151, confirmed by the student**), with **no repeats until all have been used**, then a new cycle. Logic: `src/lib/daily-pokemon.ts`.
-  - **Active Pokémon:** the user picks one of their Pokémon as active. Hours worked earn it **XP**, and it **levels up** after it has been active long enough.
+  - **The user is the trainer (reworked 2026-10-27).** Hours worked earn the **user** XP, and the user's **trainer level** goes up (`src/lib/xp.ts`; its curve now applies to the trainer). There is no "active Pokémon" to pick.
+  - **Trainer avatar:** each user has a mock trainer avatar they **customize in their profile**. It's original SVG art built in code, not game sprites, and it's saved in Supabase with the profile.
+  - **Daily Pokémon = today's coach:** each day's Pokémon "trains" the user for that day. It's the **same Pokémon for everyone that day**, drawn at random from the original Pokédex (**#1–151, confirmed by the student**), with **no repeats until all have been used**, then a new cycle. Logic: `src/lib/daily-pokemon.ts`.
+  - **Coach dialogue:** the coach talks to the user in **game-style text boxes**. The lines depend on **what kind of Pokémon it is** (its type), and on what's happening (clock in, clock out, milestones, level-up).
   - **Timesheet export:** generate a log for **1 week**, **2 weeks**, or a **custom** range. The user picks **either the start or the end date**, and the other end is calculated.
 - **Theme decision (2026-10-27): design the dusk direction (B) first.** Clock in is red, like the watch button and/or a Poké Ball. Pixel font allowed only because it is a Google Font (Pixelify Sans).
 - **Theme:** a spinoff of **Neon Arcade** (from `~/projects/p2`, tokens in `src/components/ds/neon-arcade/tokens.ts`) using **Pokémon Diamond/Pearl daytime colours**. Process: **mood board first (`/design/mood-board`), then a design system**. The student approves each before any app UI is built on them.
