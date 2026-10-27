@@ -150,7 +150,7 @@ The student also has to explain everything in class: request tracing, access con
   - **PokéAPI fair use policy:** "Locally cache resources whenever you request them". Repeated calls get your IP permanently banned. Cache every PokéAPI response (the data almost never changes), and never call it in a loop without caching.
 - **Where the API is called (browser vs. server) and why (decided by the student 2026-10-27): on the server.** Reasons in the student's words: "for the caching rule and smaller responses". PokéAPI's fair-use policy requires caching every response, and a server cache serves all users from one fetch. The server sends the browser only the few fields the coach needs instead of a ~300 KB response. Implemented in `src/lib/pokeapi.ts` (`import "server-only"`, `"use cache"` + `cacheLife("max")`, 8 s timeout, `PokemonNotFoundError` vs `PokeApiUnavailableError`). Known limit: the cache may reset when Vercel starts a fresh server instance; acceptable at this traffic.
 - **GitHub repo URL:** https://github.com/carnowell-uchicago/dbs-p4 (remote `origin`)
-- **Vercel URL:** _TBD_
+- **Vercel URL:** https://dbs-p4.vercel.app (deployed by the student 2026-10-27; `feature/clerk-auth` merged via PR #1)
 
 ### Data model
 
@@ -356,6 +356,7 @@ To help with #5, keep a short running log below. Record each time the student re
 - 2026-10-27: Playwright test written (`e2e/rls.spec.ts`, `npm run test:e2e`). First runs failed on setup, not RLS: a wrong test-user password (student fixed it), then Clerk's `needs_client_trust` new-device check (agent diagnosed it from the sign-in status and switched to ticket sign-in by email). Then it passed with RLS intact.
 - 2026-10-27: **Step 7 done.** The student broke RLS in the Supabase SQL editor (read policy on `work_sessions` → `USING (true)`); the test **failed**: user B's save was refused with "That overlaps your manual entry … 10:00", which was user A's session (`docs/test-runs/rls-broken-FAILED.txt`). The student restored the policy; the agent verified all 8 policies and RLS in the database, the test **passed** (`docs/test-runs/rls-fixed-PASSED.txt`), and the security advisor reported no issues.
 - 2026-10-27: The student ran `/security-review` (the agent first set `origin/HEAD` so it could diff against `main`): no high/medium findings. The student chose to **fix** the low CSV formula-injection note (now prefixed with `'`) and leave the Clerk `createRouteMatcher` deprecation with a reason (pages and actions also check `auth()`, RLS enforces ownership). README written.
+- 2026-10-27: **Deployed** by the student at https://dbs-p4.vercel.app after merging PR #1. The agent verified signed-out visits to /dashboard, /log, /pokedex land on sign-in (curl got Clerk's 404 for non-browser requests; a real browser is redirected), and ran the two-user RLS test against the live site: passed.
 - 2026-10-27: Agent slip: moving `fonts.ts` left the new copy staged, so it landed in an unrelated commit ("Rework the idea…"). The next commit removed the old copy; history was left as is.
 
 ---

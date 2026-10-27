@@ -5,6 +5,9 @@ import { defineConfig, devices } from "@playwright/test";
 // test users' credentials from process.env. (Values are never printed or committed.)
 loadEnvConfig(process.cwd());
 
+// Set PLAYWRIGHT_BASE_URL (e.g. https://dbs-p4.vercel.app) to test a deployed site instead of localhost.
+const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
+
 export default defineConfig({
   testDir: "./e2e",
   globalSetup: "./e2e/global.setup.ts",
@@ -13,13 +16,13 @@ export default defineConfig({
   retries: 0,
   reporter: [["list"]],
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL,
     timezoneId: "America/Chicago", // so "which day" is the same every run
     trace: "retain-on-failure",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
-  // Use the dev server if it's already running, otherwise start one.
-  webServer: {
+  // Locally: use the dev server if it's already running, otherwise start one.
+  webServer: process.env.PLAYWRIGHT_BASE_URL ? undefined : {
     command: "npm run dev",
     url: "http://localhost:3000",
     reuseExistingServer: true,
