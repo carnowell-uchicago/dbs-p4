@@ -33,7 +33,7 @@ const fakePokemon = {
     front_default: "sprite.png",
     other: { "official-artwork": { front_default: "artwork.png" } },
     versions: {
-      "generation-iv": { "diamond-pearl": { front_default: "dp.png" } },
+      "generation-iv": { "diamond-pearl": { front_default: "dp.png", back_default: "dp-back.png" } },
     },
   },
 };
@@ -117,6 +117,7 @@ describe("getPokemon", () => {
       sprite: "sprite.png",
       artwork: "artwork.png",
       gen4Sprite: "dp.png",
+      backSprite: "dp-back.png", // seen from behind, for the battle scene
       flavorText: "It is a pantomime expert that can create walls.", // English Diamond entry
       genus: "Barrier Pokémon",
     });

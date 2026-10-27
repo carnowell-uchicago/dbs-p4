@@ -1,32 +1,21 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Badge } from "@/components/ds/Tag";
-import { CoachCard } from "@/components/ds/CoachCard";
+import { CoachFromBehind } from "@/components/ds/BattleScene";
 import { Skeleton } from "@/components/ds/Skeleton";
 import { TextBox } from "@/components/ds/TextBox";
-import { TrainerCard } from "@/components/ds/TrainerCard";
 import { coachEventFor } from "@/lib/coach-event";
 import { fillCoachLine, pickCoachLine, type CoachEvent } from "@/lib/coach-lines";
 import { DAILY_EPOCH, dailyPokemonId } from "@/lib/daily-pokemon";
-import {
-  avatarOf,
-  effectiveTimeZone,
-  getProfile,
-  getSessionsOnDay,
-  getTotalXp,
-  requireUser,
-  todayKey,
-  type WorkSession,
-} from "@/lib/data";
-import { daysBetween } from "@/lib/dates";
-import { formatClock, formatDay, formatDuration } from "@/lib/format";
+import { avatarOf, effectiveTimeZone, getProfile, getSessionsBetween, getTotalXp, requireUser, todayKey } from "@/lib/data";
+import { daysBetween, listDates, weekStart } from "@/lib/dates";
+import { formatDuration } from "@/lib/format";
 import { getPokemon, PokemonNotFoundError, type Pokemon } from "@/lib/pokeapi";
-import { splitSessionByDay } from "@/lib/time";
 import { levelFromXp } from "@/lib/xp";
 import { AddTimeForm } from "./AddTimeForm";
 import { ClockPanel } from "./ClockPanel";
 import { CreateTrainer } from "./CreateTrainer";
 import { RetryButton } from "./RetryButton";
+import { msOnDay, TodaySessions } from "./TodaySessions";
 
 export const metadata: Metadata = { title: "Dashboard · Trainer Timesheet" };
 
@@ -41,14 +30,6 @@ export default function DashboardPage() {
   );
 }
 
-/** Milliseconds of `session` that fall on `dateKey` in `timeZone`. */
-function msOnDay(session: WorkSession, dateKey: string, timeZone: string, now: Date): number {
-  const s = { clockIn: new Date(session.clock_in), clockOut: session.clock_out ? new Date(session.clock_out) : null };
-  return splitSessionByDay(s, timeZone, now)
-    .filter((segment) => segment.date === dateKey)
-    .reduce((sum, segment) => sum + segment.ms, 0);
-}
-
 async function Dashboard() {
   const { supabase } = await requireUser();
   const profile = await getProfile(supabase);
@@ -57,13 +38,20 @@ async function Dashboard() {
   const timeZone = await effectiveTimeZone(profile);
   const now = new Date();
   const today = todayKey(timeZone, now);
-  const [sessions, totalXp] = await Promise.all([getSessionsOnDay(supabase, today, timeZone), getTotalXp(supabase)]);
+  const monday = weekStart(today);
+  const [weekSessions, totalXp] = await Promise.all([getSessionsBetween(supabase, monday, today, timeZone), getTotalXp(supabase)]);
 
+  const sessions = weekSessions.filter((s) => s.clock_out === null || msOnDay(s, today, timeZone, now) > 0);
   const running = sessions.find((s) => s.clock_out === null) ?? null;
   const finished = sessions.filter((s) => s.clock_out !== null);
   const finishedTodayMs = finished.reduce((sum, s) => sum + msOnDay(s, today, timeZone, now), 0);
   const runningTodayMs = running ? msOnDay(running, today, timeZone, now) : 0;
   const level = levelFromXp(totalXp);
+
+  // This week: total time, and how many days had any.
+  const perDay = listDates(monday, today).map((day) => weekSessions.reduce((sum, s) => sum + msOnDay(s, day, timeZone, now), 0));
+  const weekMs = perDay.reduce((a, b) => a + b, 0);
+  const daysLogged = perDay.filter((ms) => ms > 0).length;
 
   const last = finished.at(-1);
   const event = coachEventFor({
@@ -72,156 +60,104 @@ async function Dashboard() {
     lastClockOutAgoMs: last?.clock_out ? now.getTime() - new Date(last.clock_out).getTime() : null,
     leveledUpOnLastSession: Boolean(last) && levelFromXp(totalXp - (last?.xp_minutes ?? 0)).level < level.level,
   });
+  const coachId = dailyPokemonId(now);
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
-      {/* Clock column first in the page, so phones (and keyboards) reach Clock in first. */}
-      <div className="flex flex-col gap-4 lg:col-start-2 lg:row-start-1">
-        <ClockPanel
-          running={running ? { id: running.id, clockIn: running.clock_in, note: running.note } : null}
-          finishedTodayMs={finishedTodayMs}
-          timeZone={timeZone}
-          avatar={avatarOf(profile)}
-          trainerName={profile.trainer_name}
-        />
-        <TrainerCard
-          name={profile.trainer_name}
-          avatar={avatarOf(profile)}
-          level={level.level}
-          xpIntoLevel={level.xpIntoLevel}
-          xpForNextLevel={level.xpForNextLevel}
-          progress={level.progress}
-        />
+    <div className="flex flex-col gap-6">
+      <ClockPanel
+        running={running ? { id: running.id, clockIn: running.clock_in, note: running.note } : null}
+        finishedTodayMs={finishedTodayMs}
+        timeZone={timeZone}
+        avatar={avatarOf(profile)}
+        trainerName={profile.trainer_name}
+        level={level}
+        // The coach loads on its own: PokéAPI being slow or down never blocks the clock.
+        coach={
+          <Suspense fallback={<Skeleton className="size-24 sm:size-44" />}>
+            <Coach id={coachId} />
+          </Suspense>
+        }
+        line={
+          <Suspense fallback={<TextBox speaker="Today's coach">…</TextBox>}>
+            <CoachLine
+              id={coachId}
+              event={event}
+              seed={daysBetween(DAILY_EPOCH, today) + sessions.length}
+              trainer={profile.trainer_name}
+              hours={(finishedTodayMs + runningTodayMs) / 3_600_000}
+            />
+          </Suspense>
+        }
+      />
+
+      <dl className="grid grid-cols-3 gap-3">
+        <Stat label="Today" value={formatDuration(finishedTodayMs + runningTodayMs)} />
+        <Stat label="This week" value={formatDuration(weekMs)} />
+        <Stat label="Days this week" value={`${daysLogged} / 7`} />
+      </dl>
+
+      <div className="grid gap-6 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <TodaySessions sessions={sessions} timeZone={timeZone} today={today} now={now} />
         <AddTimeForm today={today} />
       </div>
-      <div className="lg:col-start-1 lg:row-start-1">
-        {/* The coach loads on its own: PokéAPI being slow or down never blocks the clock. */}
-        <Suspense fallback={<CoachSkeleton />}>
-          <Coach
-            event={event}
-            seed={daysBetween(DAILY_EPOCH, today) + sessions.length}
-            trainer={profile.trainer_name}
-            hours={(finishedTodayMs + runningTodayMs) / 3_600_000}
-            dateLabel={formatDay(today)}
-            now={now}
-          />
-        </Suspense>
-      </div>
     </div>
   );
 }
 
-async function Coach({
-  event,
-  seed,
-  trainer,
-  hours,
-  dateLabel,
-  now,
-}: {
-  event: CoachEvent;
-  seed: number;
-  trainer: string;
-  hours: number;
-  dateLabel: string;
-  now: Date;
-}) {
-  const id = dailyPokemonId(now);
-  // Only the PokéAPI call goes in the try: it's the part that can fail.
-  let pokemon: Pokemon | null = null;
-  let notFound = false;
-  try {
-    pokemon = await getPokemon(id);
-  } catch (error) {
-    notFound = error instanceof PokemonNotFoundError;
-  }
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) px-4 py-3">
+      <dt className="text-xs font-bold uppercase tracking-[0.08em] text-(--dk-muted)" style={{ fontFamily: "var(--dp-mono)" }}>
+        {label}
+      </dt>
+      <dd className="mt-1 text-lg font-bold tabular-nums sm:text-xl" style={{ fontFamily: "var(--dp-display)" }}>
+        {value}
+      </dd>
+    </div>
+  );
+}
 
+/** Ask PokéAPI for today's coach. Only this call goes in the try: it's the part that can fail. */
+async function loadCoach(id: number): Promise<{ pokemon: Pokemon | null; notFound: boolean }> {
+  try {
+    return { pokemon: await getPokemon(id), notFound: false };
+  } catch (error) {
+    return { pokemon: null, notFound: error instanceof PokemonNotFoundError };
+  }
+}
+
+async function Coach({ id }: { id: number }) {
+  const { pokemon } = await loadCoach(id);
+  if (!pokemon) return <CoachFromBehind name="???" types={[]} sprite={null} />;
+  return <CoachFromBehind name={pokemon.displayName} types={pokemon.types} sprite={pokemon.backSprite ?? pokemon.sprite} />;
+}
+
+async function CoachLine({ id, event, seed, trainer, hours }: { id: number; event: CoachEvent; seed: number; trainer: string; hours: number }) {
+  const { pokemon, notFound } = await loadCoach(id);
   if (!pokemon) {
     return (
-      <section aria-label="Today's coach" className="flex flex-col gap-3 rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) p-4">
-        <TextBox tone="error" speaker="Today's coach" live="polite" action={<RetryButton />}>
-          {notFound
-            ? `Coach #${id} couldn't be found in the Pokédex today.`
-            : "Today's coach couldn't make it: PokéAPI isn't answering right now."}{" "}
-          Your clock still works, and your hours are saved as normal.
-        </TextBox>
-      </section>
+      <TextBox tone="error" speaker="Today's coach" live="polite" action={<RetryButton />}>
+        {notFound ? `Coach #${id} couldn't be found in the Pokédex today.` : "Today's coach couldn't make it: PokéAPI isn't answering right now."}{" "}
+        Your clock still works, and your hours are saved as normal.
+      </TextBox>
     );
   }
-
-  const line = fillCoachLine(pickCoachLine({ types: pokemon.types, event, seed }), {
-    pokemon: pokemon.displayName,
-    trainer,
-    hours,
-  });
+  const text = fillCoachLine(pickCoachLine({ types: pokemon.types, event, seed }), { pokemon: pokemon.displayName, trainer, hours });
   return (
-    <CoachCard
-      number={pokemon.id}
-      name={pokemon.displayName}
-      types={pokemon.types}
-      sprite={pokemon.gen4Sprite ?? pokemon.sprite}
-      line={line}
-      dateLabel={dateLabel}
-    />
-  );
-}
-
-function TodaySessions({ sessions, timeZone, today, now }: { sessions: WorkSession[]; timeZone: string; today: string; now: Date }) {
-  return (
-    <section aria-labelledby="today-h" className="rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) p-4">
-      <h2 id="today-h" className="text-sm font-bold uppercase tracking-[0.08em]" style={{ fontFamily: "var(--dp-display)" }}>
-        Today · {formatDay(today)}
-      </h2>
-      {sessions.length === 0 ? (
-        <p className="mt-2 text-sm text-(--dk-muted)">No time logged today yet. Press the Poké Ball to start your first session.</p>
-      ) : (
-        <ul className="mt-3 divide-y-2 divide-(--dk-line)">
-          {sessions.map((s) => (
-            <li key={s.id} className="flex flex-wrap items-baseline gap-x-3 gap-y-1 py-2 text-sm">
-              <span className="tabular-nums" style={{ fontFamily: "var(--dp-mono)" }}>
-                {formatClock(s.clock_in, timeZone)} – {s.clock_out ? formatClock(s.clock_out, timeZone) : "now"}
-              </span>
-              <span className="text-(--dk-muted)" style={{ fontFamily: "var(--dp-mono)" }}>
-                {formatDuration(msOnDay(s, today, timeZone, now))}
-              </span>
-              {s.clock_out === null && <Badge kind="today">Running</Badge>}
-              {s.source === "manual" && <Badge kind="new">Manual · no XP</Badge>}
-              {s.note && <span className="basis-full text-(--dk-muted)">{s.note}</span>}
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
-  );
-}
-
-function CoachSkeleton() {
-  return (
-    <div aria-label="Loading today's coach" role="status" className="flex flex-col gap-3 rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) p-4">
-      <div className="flex items-end gap-4">
-        <Skeleton className="size-24" />
-        <div className="flex-1 space-y-2">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-7 w-44" />
-          <Skeleton className="h-5 w-24" />
-        </div>
-      </div>
-      <Skeleton className="h-20 w-full" />
-    </div>
+    <TextBox speaker={pokemon.displayName} live="polite">
+      {text}
+    </TextBox>
   );
 }
 
 function DashboardSkeleton() {
   return (
-    <div role="status" aria-label="Loading your dashboard" className="grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
-      <div className="flex flex-col gap-4 lg:col-start-2 lg:row-start-1">
-        <Skeleton className="h-52 w-full" />
-        <Skeleton className="h-28 w-full" />
-        <Skeleton className="h-32 w-full" />
-      </div>
-      <div className="lg:col-start-1 lg:row-start-1">
-        <CoachSkeleton />
+    <div role="status" aria-label="Loading your dashboard" className="flex flex-col gap-6">
+      <Skeleton className="h-[30rem] w-full" />
+      <div className="grid grid-cols-3 gap-3">
+        <Skeleton className="h-20" />
+        <Skeleton className="h-20" />
+        <Skeleton className="h-20" />
       </div>
     </div>
   );

@@ -52,15 +52,15 @@ export async function effectiveTimeZone(profile: Profile | null): Promise<string
   return DAILY_TIMEZONE;
 }
 
-/** Sessions that touch the calendar day `dateKey` in `timeZone`, oldest first. */
-export async function getSessionsOnDay(supabase: Supabase, dateKey: string, timeZone: string): Promise<WorkSession[]> {
-  const dayStart = startOfDay(dateKey, timeZone).toISOString();
-  const dayEnd = startOfDay(addDays(dateKey, 1), timeZone).toISOString();
+/** Sessions that touch any day from `firstDay` to `lastDay` (both included) in `timeZone`, oldest first. */
+export async function getSessionsBetween(supabase: Supabase, firstDay: string, lastDay: string, timeZone: string): Promise<WorkSession[]> {
+  const rangeStart = startOfDay(firstDay, timeZone).toISOString();
+  const rangeEnd = startOfDay(addDays(lastDay, 1), timeZone).toISOString();
   const { data, error } = await supabase
     .from("work_sessions")
     .select("*")
-    .lt("clock_in", dayEnd)
-    .or(`clock_out.is.null,clock_out.gt.${dayStart}`)
+    .lt("clock_in", rangeEnd)
+    .or(`clock_out.is.null,clock_out.gt.${rangeStart}`)
     .order("clock_in");
   if (error) throw error;
   return data;

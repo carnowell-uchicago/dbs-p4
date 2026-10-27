@@ -68,3 +68,10 @@ export function listDates(start: string, end: string): string[] {
   }
   return dates;
 }
+
+/** The Monday of the week that `dateKey` is in: weekStart("2026-10-29") (a Thursday) -> "2026-10-26". */
+export function weekStart(dateKey: string): string {
+  const weekday = new Date(toUtcMs(dateKey)).getUTCDay(); // 0 = Sunday … 6 = Saturday
+  const daysSinceMonday = (weekday + 6) % 7;
+  return addDays(dateKey, -daysSinceMonday);
+}

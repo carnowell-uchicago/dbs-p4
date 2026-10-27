@@ -74,7 +74,7 @@ export function ClockStage({
   const t = trainerStyle[look.trainer];
   const beamColour = look.beam === "red" ? "var(--dk-red)" : "#ffffff";
   return (
-    <div className="relative mx-auto flex w-fit items-end gap-8 sm:gap-12">
+    <div className="relative mx-auto flex w-fit items-end gap-2 sm:gap-12">
       <ClockButton running={out} size="md" open={look.lidOpen} {...button} />
 
       {/* The beam, from the centre of the ball (64px in) to the centre of the spot (48px from the right). */}

@@ -42,6 +42,7 @@ export type Pokemon = {
   sprite: string | null; // small pixel sprite
   artwork: string | null; // large official artwork
   gen4Sprite: string | null; // Diamond/Pearl sprite
+  backSprite: string | null; // seen from behind (Diamond/Pearl if there is one), for the battle scene
   flavorText: string; // Pokédex entry, English
   genus: string; // e.g. "Seed Pokémon"
 };
@@ -124,9 +125,10 @@ type PokemonResponse = {
   types: { slot: number; type: { name: string } }[];
   sprites: {
     front_default: string | null;
+    back_default?: string | null;
     other?: { "official-artwork"?: { front_default: string | null } };
     versions?: {
-      "generation-iv"?: { "diamond-pearl"?: { front_default: string | null } };
+      "generation-iv"?: { "diamond-pearl"?: { front_default: string | null; back_default?: string | null } };
     };
   };
 };
@@ -175,6 +177,10 @@ export function trimPokemon(
     gen4Sprite:
       pokemon.sprites.versions?.["generation-iv"]?.["diamond-pearl"]
         ?.front_default ?? null,
+    backSprite:
+      pokemon.sprites.versions?.["generation-iv"]?.["diamond-pearl"]?.back_default ??
+      pokemon.sprites.back_default ??
+      null,
     flavorText: pickFlavorText(species.flavor_text_entries),
     genus,
   };

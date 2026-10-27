@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addDays, daysBetween, isValidDateKey, listDates } from "./dates";
+import { addDays, daysBetween, isValidDateKey, listDates, weekStart } from "./dates";
 
 describe("isValidDateKey", () => {
   it("accepts real dates and rejects bad ones", () => {
@@ -31,5 +31,14 @@ describe("addDays / daysBetween / listDates", () => {
       "2026-11-01",
       "2026-11-02",
     ]);
+  });
+});
+
+describe("weekStart", () => {
+  it("goes back to Monday, and keeps Monday as is", () => {
+    expect(weekStart("2026-10-29")).toBe("2026-10-26"); // Thursday
+    expect(weekStart("2026-10-26")).toBe("2026-10-26"); // Monday
+    expect(weekStart("2026-11-01")).toBe("2026-10-26"); // Sunday belongs to the week before
+    expect(weekStart("2027-01-01")).toBe("2026-12-28"); // across a year
   });
 });
