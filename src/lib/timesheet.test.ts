@@ -146,3 +146,18 @@ describe("CSV", () => {
     );
   });
 });
+
+describe("toCsv with notes", () => {
+  it("adds a Notes column, quoting notes that contain commas", () => {
+    const rows = [
+      { date: "2026-10-26", firstClockIn: "09:00", lastClockOut: "10:00", running: false, sessions: 1, minutes: 60, hours: 1 },
+      { date: "2026-10-27", firstClockIn: null, lastClockOut: null, running: false, sessions: 0, minutes: 0, hours: 0 },
+    ];
+    const notes = new Map([["2026-10-26", ["Q3 report", "Call with Sam, Ana"]]]);
+    expect(toCsv(rows, notes)).toBe(
+      "Date,First clock-in,Last clock-out,Sessions,Hours,Minutes,Notes\r\n" +
+        '2026-10-26,09:00,10:00,1,1.00,60,"Q3 report; Call with Sam, Ana"\r\n' +
+        "2026-10-27,,,0,0.00,0,\r\n",
+    );
+  });
+});

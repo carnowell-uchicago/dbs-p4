@@ -132,11 +132,15 @@ export const CSV_HEADER = [
   "Minutes",
 ];
 
-/** Turns timesheet rows into CSV text (header first, lines end with CRLF as RFC 4180 says). */
-export function toCsv(rows: TimesheetRow[]): string {
-  const lines = [CSV_HEADER.map(csvField).join(",")];
+/**
+ * Turns timesheet rows into CSV text (header first, lines end with CRLF as RFC 4180 says).
+ * Pass `notesByDate` to add a last "Notes" column (that day's session notes, joined with "; ").
+ */
+export function toCsv(rows: TimesheetRow[], notesByDate?: Map<string, string[]>): string {
+  const header = notesByDate ? [...CSV_HEADER, "Notes"] : CSV_HEADER;
+  const lines = [header.map(csvField).join(",")];
   for (const row of rows) {
-    const fields = [
+    const fields: (string | number)[] = [
       row.date,
       row.firstClockIn ?? "",
       row.running ? "running" : (row.lastClockOut ?? ""),
@@ -144,6 +148,7 @@ export function toCsv(rows: TimesheetRow[]): string {
       row.hours.toFixed(2),
       row.minutes,
     ];
+    if (notesByDate) fields.push((notesByDate.get(row.date) ?? []).join("; "));
     lines.push(fields.map(csvField).join(","));
   }
   return lines.join("\r\n") + "\r\n";

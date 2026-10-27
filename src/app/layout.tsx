@@ -24,7 +24,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       >
         <ClerkProvider signInFallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
           <TimeZoneCookie />
-          <header className="border-b-2 border-(--dk-edge) bg-(--dk-panel)">
+          <header className="border-b-2 border-(--dk-edge) bg-(--dk-panel) print:hidden">
             <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:gap-4 sm:px-6">
               <Link
                 href="/"
@@ -40,7 +40,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </div>
           </header>
           <div className="flex flex-1 flex-col">{children}</div>
-          <footer className="border-t-2 border-(--dk-edge) bg-(--dk-panel) px-4 py-3 text-center text-xs text-(--dk-muted)">
+          <footer className="border-t-2 border-(--dk-edge) bg-(--dk-panel) px-4 py-3 text-center text-xs text-(--dk-muted) print:hidden">
             Pokémon data from{" "}
             <a href="https://pokeapi.co" className={`text-(--dk-diamond) underline underline-offset-2 ${focusRing}`}>
               PokéAPI
@@ -70,6 +70,9 @@ function AuthControls() {
       <Show when="signed-in">
         <Link href="/dashboard" className={navLink}>
           Dashboard
+        </Link>
+        <Link href="/log" className={navLink}>
+          Timesheet
         </Link>
         <UserButton />
       </Show>

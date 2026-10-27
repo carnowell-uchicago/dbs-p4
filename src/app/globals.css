@@ -3,3 +3,16 @@
 /* Colours, fonts and the tall-grass background come from src/components/ds/
    (applied on <body> in layout.tsx). Nothing unlayered here: unlayered rules
    would beat Tailwind's utility classes. */
+
+/* Printing a timesheet: plain black on white, no grass, no glow. (The page background is an
+   inline style on <body>, so !important is needed to override it, only when printing.) */
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+}

@@ -1,4 +1,5 @@
 // Today's sessions as a list. Pure display: the page passes the rows in.
+import Link from "next/link";
 import { Badge } from "@/components/ds/Tag";
 import type { Tables } from "@/lib/supabase/database.types";
 
@@ -18,9 +19,18 @@ export function msOnDay(session: WorkSession, dateKey: string, timeZone: string,
 export function TodaySessions({ sessions, timeZone, today, now }: { sessions: WorkSession[]; timeZone: string; today: string; now: Date }) {
   return (
     <section aria-labelledby="today-h" className="rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) p-4">
-      <h2 id="today-h" className="text-sm font-bold uppercase tracking-[0.08em]" style={{ fontFamily: "var(--dp-display)" }}>
-        Today · {formatDay(today)}
-      </h2>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 id="today-h" className="text-sm font-bold uppercase tracking-[0.08em]" style={{ fontFamily: "var(--dp-display)" }}>
+          Today · {formatDay(today)}
+        </h2>
+        <Link
+          href="/log"
+          className="rounded-(--dk-r-md) border-2 border-(--dk-edge) px-3 py-1.5 text-xs font-bold uppercase tracking-[0.08em] text-(--dk-ice) hover:border-(--dk-sky) hover:bg-(--dk-raised) focus-visible:outline-3 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-(--dk-sky)"
+          style={{ fontFamily: "var(--dp-display)" }}
+        >
+          Timesheet · print / CSV →
+        </Link>
+      </div>
       {sessions.length === 0 ? (
         <p className="mt-2 text-sm text-(--dk-muted)">No time logged today yet. Press the Poké Ball to start your first session.</p>
       ) : (
