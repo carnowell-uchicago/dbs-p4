@@ -155,7 +155,7 @@ The student also has to explain everything in class: request tracing, access con
 
 > **Write this in Step 2 and get the student's approval before building anything that touches the database.** Keep it small (usually 2–3 tables). Every table that holds a person's data has a `user_id` column.
 
-**Proposed by the agent, NOT yet approved by the student** (ask before creating anything):
+**Approved by the student on 2026-10-27.** Migrations are in `supabase/migrations/`.
 
 ```
 profiles
@@ -177,6 +177,9 @@ work_sessions
   created_at    timestamptz not null default now()
   + check: source = 'manual' requires clock_out (a manual entry is always finished)
   + unique partial index: one running session per user (where clock_out is null)
+  + exclusion constraint: no two sessions of one user may overlap in time (a running session counts as
+    running until 'infinity'). The app checks first and tells the user exactly which session it overlaps;
+    the constraint is the backstop for races and hand-crafted requests
   + trigger (before insert/update): clock sessions get clock_in = recorded_in = now() on insert and
     clock_out = recorded_out = now() when stopped; source and recorded_* can never be changed by the client
 RLS: enabled on both; select/insert/update/delete only where user_id = (auth.jwt() ->> 'sub')
@@ -187,6 +190,7 @@ Student requests (2026-10-27):
 - **Manual / retroactive entries** count toward hours and the timesheet CSV, but **earn no trainer XP**, to encourage logging live every day.
 - **Timezone:** auto-detect from the browser by default; a saved profile setting overrides it.
 - **No faked sessions:** live sessions are timed by the **database's own clock** (`now()` in a trigger), not by times the browser sends.
+- **No overlaps:** a manual entry or edit that overlaps logged time is rejected, and the user is told exactly which session it overlaps. Manual entries can't end in the future.
 - **Edits can only reduce XP, never increase it:** XP = the overlap of the edited times with the DB-recorded window, so shrinking a session lowers XP and stretching it adds hours but no XP. Deleting removes its XP.
 
 Not stored, calculated: trainer level (from the sum of `xp_minutes`, curve in `src/lib/xp.ts`), the daily coach (from the date, `src/lib/daily-pokemon.ts`), and which coach trained you on each logged day.
