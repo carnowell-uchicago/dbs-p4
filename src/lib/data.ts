@@ -94,3 +94,10 @@ export async function getOverlapping(supabase: Supabase, start: Date, end: Date)
 export function todayKey(timeZone: string, now: Date): string {
   return toDateKey(now, timeZone);
 }
+
+/** Every session's start and end, for the Pokédex's "coached you" history. */
+export async function getAllSessionTimes(supabase: Supabase) {
+  const { data, error } = await supabase.from("work_sessions").select("clock_in, clock_out").order("clock_in");
+  if (error) throw error;
+  return data.map((s) => ({ clockIn: new Date(s.clock_in), clockOut: s.clock_out ? new Date(s.clock_out) : null }));
+}

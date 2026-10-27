@@ -71,6 +71,9 @@ function AuthControls() {
         <Link href="/dashboard" className={navLink}>
           Dashboard
         </Link>
+        <Link href="/pokedex" className={navLink}>
+          Pokédex
+        </Link>
         <Link href="/log" className={navLink}>
           Timesheet
         </Link>
