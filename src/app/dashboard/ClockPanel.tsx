@@ -12,6 +12,7 @@ import { TextBox } from "@/components/ds/TextBox";
 import type { Avatar } from "@/components/ds/TrainerAvatar";
 import { WatchTimer } from "@/components/ds/WatchTimer";
 import { formatClock, formatDuration, formatElapsed } from "@/lib/format";
+import { playerHpAt, type Span } from "@/lib/hp";
 import type { LevelInfo } from "@/lib/xp";
 import { clockIn, clockOut, type ActionResult } from "./actions";
 
@@ -22,6 +23,8 @@ export function ClockPanel({
   avatar,
   trainerName,
   level,
+  todaySpans,
+  dayStart,
   coach,
   line,
 }: {
@@ -31,6 +34,8 @@ export function ClockPanel({
   avatar: Avatar;
   trainerName: string;
   level: LevelInfo;
+  todaySpans: Span[]; // today's sessions (for HP: drains while working, recovers on breaks)
+  dayStart: number; // when today began, in your time zone
   coach: ReactNode;
   line: ReactNode;
 }) {
@@ -42,15 +47,16 @@ export function ClockPanel({
   // says no, React puts it back when the transition ends (and the ball plays in reverse).
   const [out, setOut] = useOptimistic(Boolean(running));
 
+  // Tick every second: the watch runs while clocked in, and HP recovers while clocked out.
   useEffect(() => {
-    if (!running) return;
     const timer = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(timer);
-  }, [running]);
+  }, []);
 
   const runningMs = running ? Math.max(0, now - new Date(running.clockIn).getTime()) : 0;
   const todayMs = finishedTodayMs + runningMs;
   const hp = shiftHp(todayMs);
+  const player = playerHpAt(todaySpans, dayStart, now); // −1 per 0.1 h worked, +1 per 0.1 h off
 
   function press() {
     setResult(null);
@@ -83,11 +89,11 @@ export function ClockPanel({
         />
       }
       coach={coach}
-      stage={<ClockStage out={out} avatar={avatar} name={trainerName} disabled={pending} onClick={press} aria-busy={pending} />}
+      stage={<ClockStage out={out} exhausted={player.exhausted} avatar={avatar} name={trainerName} disabled={pending} onClick={press} aria-busy={pending} />}
       playerPlate={
         <NamePlate name={trainerName} tag={`Lv ${level.level}`} side="player">
-          {/* Like the games: your HP sits above your XP. You never take damage here, so it stays full. */}
-          <PlateBar label="HP" fill={1} colour="var(--dk-hp)" caption="100 / 100" />
+          {/* Like the games: your HP sits above your XP. It wears down as the day goes on. */}
+          <PlateBar label="HP" fill={player.hp / 100} colour={player.colour} caption={player.exhausted ? `${player.hp} / 100 · tired!` : `${player.hp} / 100`} />
           <PlateBar
             label="XP"
             fill={level.progress}

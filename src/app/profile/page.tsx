@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ds/Skeleton";
 import { avatarOf, getProfile, requireUser } from "@/lib/data";
+import { zoneOptions } from "@/lib/timezones";
 import { ProfileForm } from "./ProfileForm";
 
 export const metadata: Metadata = { title: "Your trainer · Trainer Timesheet" };
@@ -29,7 +30,7 @@ async function Editor() {
       name={profile.trainer_name}
       avatar={avatarOf(profile)}
       timezone={profile.timezone}
-      zones={Intl.supportedValuesOf("timeZone")}
+      zones={zoneOptions(new Date(), profile.timezone)}
     />
   );
 }

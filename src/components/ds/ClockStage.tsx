@@ -47,11 +47,13 @@ const trainerStyle: Record<Look["trainer"], { wrap: string; glow: string | null;
 
 export function ClockStage({
   out,
+  exhausted = false,
   avatar,
   name,
   ...button
 }: Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children"> & {
   out: boolean; // is the trainer out of the ball (clocked in)?
+  exhausted?: boolean; // HP at 20% or less: droopy eyes, sweat, a slouch
   avatar: Avatar;
   name: string;
 }) {
@@ -90,7 +92,10 @@ export function ClockStage({
           className={`absolute bottom-0 h-4 rounded-[50%] bg-black/55 blur-[1px] transition-[width,opacity] duration-300 ${look.trainer === "inside" ? "w-16 opacity-70" : "w-20 opacity-90"}`}
         />
         <div className={`relative mb-1.5 origin-bottom transition-[scale,translate,opacity] duration-300 ease-out ${t.wrap}`}>
-          <TrainerAvatar avatar={avatar} size={88} />
+          {/* Worn out: the trainer slouches a little. */}
+          <div className={exhausted ? "translate-y-[3px]" : ""}>
+            <TrainerAvatar avatar={avatar} size={88} exhausted={exhausted} />
+          </div>
           {t.glow && (
             <div className={`absolute inset-0 transition-opacity duration-300 ${t.glowOpacity}`} style={{ filter: `drop-shadow(0 0 6px ${t.glow})` }}>
               <TrainerAvatar avatar={avatar} size={88} silhouette={t.glow} />

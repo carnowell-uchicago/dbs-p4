@@ -59,6 +59,41 @@ export type CoachEvent = (typeof COACH_EVENTS)[number];
 export const FALLBACK_TYPE: CoachType = "normal";
 
 /**
+ * Clock in and clock out are said in two parts: a call (part 1, below, with the trainer's
+ * name) and a type-flavoured message (part 2, in coachLines). Mixing them gives each type
+ * many more combinations. In this app the roles are swapped: the coach sends *you* out.
+ *
+ * Sources: the anime ("I choose you!", "Go!", "Let's go!", "Return!") and the Gen 3/4 games'
+ * send-out and recall text ("Go! X!", "Do it! X!", "Go for it, X!", "Your foe's weak! Get
+ * 'em, X!", "X, come back!", "OK! X! Come back!", "Good! X! Come back!", "X, that's enough!
+ * Come back!"). The ones marked "joke" are ours.
+ */
+export const CLOCK_IN_CALLS = [
+  "{trainer}, I choose you!", // anime
+  "{trainer}, go!", // anime
+  "{trainer}, let's go!", // anime
+  "Go! {trainer}!", // games
+  "Do it! {trainer}!", // games
+  "Go for it, {trainer}!", // games
+  "The Clock's weak! Get 'em, {trainer}!", // games ("Your foe's weak! Get 'em, X!")
+  "{trainer}, you're up!", // anime-style
+  "Alright {trainer}, show 'em what you've got!", // anime-style
+] as const;
+
+export const CLOCK_OUT_CALLS = [
+  "{trainer}, that's enough! Come back!", // games
+  "{trainer}, return!", // anime
+  "{trainer}, come back!", // games
+  "OK! {trainer}! Come back!", // games
+  "Good! {trainer}! Come back!", // games
+  "{trainer}, that's enough... Go home already!", // joke
+  "{trainer}, return! (To the couch, this time.)", // joke
+  "{trainer}, come back! Your bed misses you.", // joke
+  "{trainer}, that's enough! Even Snorlax takes naps.", // joke
+  "{trainer}, return! The work will still be there tomorrow.", // joke
+] as const;
+
+/**
  * All the line templates: coachLines[type][event] is a list of 3 lines.
  * Rules for writing lines: short (fits a text box), kind, never pushes the
  * user to work longer or skip a break.
@@ -71,9 +106,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} is your coach today. Let's take it one step at a time!",
     ],
     clockIn: [
-      "{trainer}, I choose you! One step at a time, and {pokemon} is right here with you!",
-      "{trainer}, I choose you! {pokemon} used Helping Hand. Let's have a good day!",
-      "{trainer}, I choose you! Nice and steady wins the day. You've got this!",
+      "One step at a time, and {pokemon} is right here with you!",
+      "{pokemon} used Helping Hand. Let's have a good day!",
+      "Nice and steady wins the day. You've got this!",
     ],
     milestone1h: [
       "One hour down! {pokemon} is proud of you.",
@@ -96,9 +131,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} yawns and stretches. Want to join it for a minute?",
     ],
     clockOut: [
-      "That's enough, {trainer}. Come back and rest. You put in {hours}h today.",
-      "That's enough, {trainer}. {pokemon} logged {hours}h for you. Great work!",
-      "That's enough, {trainer}. Time for a cozy break. See you next time!",
+      "Time to rest. You put in {hours}h today.",
+      "{pokemon} logged {hours}h for you. Great work!",
+      "Time for a cozy break. See you next time!",
     ],
     levelUp: [
       "{trainer} reached a new trainer level! {pokemon} cheers loudly!",
@@ -119,9 +154,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "Today's coach: {pokemon}! It's burning with excitement.",
     ],
     clockIn: [
-      "{trainer}, I choose you! {pokemon} used Ember. Let's light up today's work!",
-      "{trainer}, I choose you! Feel that warmth? Your focus is all fired up!",
-      "{trainer}, I choose you! {pokemon} stokes the flames. Let's turn up the heat!",
+      "{pokemon} used Ember. Let's light up today's work!",
+      "Feel that warmth? Your focus is all fired up!",
+      "{pokemon} stokes the flames. Let's turn up the heat!",
     ],
     milestone1h: [
       "One hour! {pokemon}'s flame grows a little brighter.",
@@ -144,9 +179,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "Long stretch! {pokemon} suggests cooling down for a few minutes.",
     ],
     clockOut: [
-      "That's enough, {trainer}. Let the embers glow soft. You put in {hours}h today.",
-      "That's enough, {trainer}. {hours}h of warm, steady work. Time to cool down!",
-      "That's enough, {trainer}. Even the brightest flame rests. Great job today!",
+      "Let the embers glow soft. You put in {hours}h today.",
+      "{hours}h of warm, steady work. Time to cool down!",
+      "Even the brightest flame rests. Great job today!",
     ],
     levelUp: [
       "Level up! {pokemon} sets off a victory fireworks show!",
@@ -167,9 +202,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} blows a friendly bubble. Ready when you are.",
     ],
     clockIn: [
-      "{trainer}, I choose you! Find your current and flow through today's work!",
-      "{trainer}, I choose you! {pokemon} used Aqua Ring. Calm focus, one wave at a time.",
-      "{trainer}, I choose you! Dive in! {pokemon} will keep the waters calm.",
+      "Find your current and flow through today's work!",
+      "{pokemon} used Aqua Ring. Calm focus, one wave at a time.",
+      "Dive in! {pokemon} will keep the waters calm.",
     ],
     milestone1h: [
       "One hour flowed by! {pokemon} splashes softly.",
@@ -192,9 +227,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} floats on its back. Join it for a quick stretch?",
     ],
     clockOut: [
-      "That's enough, {trainer}. Return and rest; {hours}h flowed by nicely today.",
-      "That's enough, {trainer}. The tide goes out for now. Lovely work today!",
-      "That's enough, {trainer}. {pokemon} splashes goodbye. {hours}h logged!",
+      "Rest up; {hours}h flowed by nicely today.",
+      "The tide goes out for now. Lovely work today!",
+      "{pokemon} splashes goodbye. {hours}h logged!",
     ],
     levelUp: [
       "Level up! {pokemon} makes a fountain of celebration!",
@@ -215,9 +250,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} rustles hello. Ready to put down some roots?",
     ],
     clockIn: [
-      "{trainer}, I choose you! Soak up the sun and let your work grow!",
-      "{trainer}, I choose you! {pokemon} used Growth. Little by little, you'll bloom!",
-      "{trainer}, I choose you! Plant a few good seeds today. {pokemon} believes in you!",
+      "Soak up the sun and let your work grow!",
+      "{pokemon} used Growth. Little by little, you'll bloom!",
+      "Plant a few good seeds today. {pokemon} believes in you!",
     ],
     milestone1h: [
       "One hour! {pokemon} spots a tiny new sprout.",
@@ -240,9 +275,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} found a shady spot. Take a short break with it?",
     ],
     clockOut: [
-      "That's enough, {trainer}. Time to rest your roots. You grew {hours}h today.",
-      "That's enough, {trainer}. Every garden needs rest. Lovely work today!",
-      "That's enough, {trainer}. {pokemon} rustles happily. {hours}h well tended!",
+      "Time to rest your roots. You grew {hours}h today.",
+      "Every garden needs rest. Lovely work today!",
+      "{pokemon} rustles happily. {hours}h well tended!",
     ],
     levelUp: [
       "Level up! {pokemon} bursts into bloom for you!",
@@ -263,9 +298,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} sends a tiny spark your way. Ready to power up?",
     ],
     clockIn: [
-      "{trainer}, I choose you! Let's spark some focus and charge through today's work!",
-      "{trainer}, I choose you! {pokemon} used Charge. You're powered up and ready!",
-      "{trainer}, I choose you! Zap! {pokemon} feels the energy. Let's go!",
+      "Let's spark some focus and charge through today's work!",
+      "{pokemon} used Charge. You're powered up and ready!",
+      "Zap! {pokemon} feels the energy. Let's go!",
     ],
     milestone1h: [
       "One hour! {pokemon}'s battery bar ticks up.",
@@ -288,9 +323,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} says: low battery! How about a short break?",
     ],
     clockOut: [
-      "That's enough, {trainer}. Time to recharge. You powered through {hours}h today.",
-      "That's enough, {trainer}. Power down and rest. {pokemon} is so proud!",
-      "That's enough, {trainer}. {hours}h of bright sparks! Go recharge your batteries.",
+      "Time to recharge. You powered through {hours}h today.",
+      "Power down and rest. {pokemon} is so proud!",
+      "{hours}h of bright sparks! Go recharge your batteries.",
     ],
     levelUp: [
       "Level up! {pokemon} lights up the whole room!",
@@ -311,9 +346,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} sparkles like frost. Ready to start fresh?",
     ],
     clockIn: [
-      "{trainer}, I choose you! Stay cool and clear. Let's glide through today!",
-      "{trainer}, I choose you! {pokemon} used Mist. Calm, crisp focus ahead.",
-      "{trainer}, I choose you! Fresh as new snow! {pokemon} is ready to coach.",
+      "Stay cool and clear. Let's glide through today!",
+      "{pokemon} used Mist. Calm, crisp focus ahead.",
+      "Fresh as new snow! {pokemon} is ready to coach.",
     ],
     milestone1h: [
       "One hour! {pokemon} adds a snowflake to your pile.",
@@ -336,9 +371,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} builds a tiny snow fort. Take a break and visit?",
     ],
     clockOut: [
-      "That's enough, {trainer}. Time to thaw out and rest. You did {hours}h today.",
-      "That's enough, {trainer}. Cozy up somewhere warm. Cool work today!",
-      "That's enough, {trainer}. {pokemon} waves a frosty goodbye. {hours}h logged!",
+      "Time to thaw out and rest. You did {hours}h today.",
+      "Cozy up somewhere warm. Cool work today!",
+      "{pokemon} waves a frosty goodbye. {hours}h logged!",
     ],
     levelUp: [
       "Level up! {pokemon} makes it snow glitter!",
@@ -359,9 +394,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} flexes hello. Let's give it a good effort!",
     ],
     clockIn: [
-      "{trainer}, I choose you! Warm up, stay loose, and give it your best!",
-      "{trainer}, I choose you! {pokemon} used Bulk Up. You're ready for today!",
-      "{trainer}, I choose you! Good form beats rushing. Let's train smart!",
+      "Warm up, stay loose, and give it your best!",
+      "{pokemon} used Bulk Up. You're ready for today!",
+      "Good form beats rushing. Let's train smart!",
     ],
     milestone1h: [
       "One hour! {pokemon} gives you a mighty high five.",
@@ -384,9 +419,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} starts cool-down stretches. Join in for a minute?",
     ],
     clockOut: [
-      "That's enough, {trainer}. Every champion rests. You trained {hours}h today.",
-      "That's enough, {trainer}. {pokemon} bows with respect. Strong work today!",
-      "That's enough, {trainer}. Cool down and stretch. {hours}h of solid training!",
+      "Every champion rests. You trained {hours}h today.",
+      "{pokemon} bows with respect. Strong work today!",
+      "Cool down and stretch. {hours}h of solid training!",
     ],
     levelUp: [
       "Level up! {pokemon} lifts you up in celebration!",
@@ -407,9 +442,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} bubbles happily. Ready to brew up some focus?",
     ],
     clockIn: [
-      "{trainer}, I choose you! {pokemon} used Toxic... on distractions only!",
-      "{trainer}, I choose you! Let's ooze some focus into today's work!",
-      "{trainer}, I choose you! {pokemon} bubbles with energy. Time to get going!",
+      "{pokemon} used Toxic... on distractions only!",
+      "Let's ooze some focus into today's work!",
+      "{pokemon} bubbles with energy. Time to get going!",
     ],
     milestone1h: [
       "One hour! {pokemon} makes a happy bubble.",
@@ -432,9 +467,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} oozes into a comfy puddle. Join it for a break?",
     ],
     clockOut: [
-      "That's enough, {trainer}. Time to rest. You put in {hours}h today.",
-      "That's enough, {trainer}. {pokemon} drips with pride. Great work today!",
-      "That's enough, {trainer}. {hours}h done! Go relax; you've earned it.",
+      "Time to rest. You put in {hours}h today.",
+      "{pokemon} drips with pride. Great work today!",
+      "{hours}h done! Go relax; you've earned it.",
     ],
     levelUp: [
       "Level up! {pokemon} bubbles over with joy!",
@@ -455,9 +490,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} stomps a friendly hello. Ready to dig in?",
     ],
     clockIn: [
-      "{trainer}, I choose you! Dig in and build on solid ground today!",
-      "{trainer}, I choose you! {pokemon} used Mud-Slap on distractions. Let's go!",
-      "{trainer}, I choose you! Feet firm, one shovel at a time. You've got this!",
+      "Dig in and build on solid ground today!",
+      "{pokemon} used Mud-Slap on distractions. Let's go!",
+      "Feet firm, one shovel at a time. You've got this!",
     ],
     milestone1h: [
       "One hour! {pokemon} dug the first tunnel.",
@@ -480,9 +515,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} digs a cozy nap hole. Take a short break?",
     ],
     clockOut: [
-      "That's enough, {trainer}. Time to rest your feet. You dug in for {hours}h today.",
-      "That's enough, {trainer}. {pokemon} pats the earth. Solid work today!",
-      "That's enough, {trainer}. {hours}h of steady digging! Go take it easy.",
+      "Time to rest your feet. You dug in for {hours}h today.",
+      "{pokemon} pats the earth. Solid work today!",
+      "{hours}h of steady digging! Go take it easy.",
     ],
     levelUp: [
       "Level up! {pokemon} makes the ground rumble with joy!",
@@ -503,9 +538,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} flaps a cheerful hello. Ready for takeoff?",
     ],
     clockIn: [
-      "{trainer}, I choose you! Spread your wings and catch a good breeze today!",
-      "{trainer}, I choose you! {pokemon} used Tailwind. Smooth flying ahead!",
-      "{trainer}, I choose you! Up, up and away! {pokemon} is soaring with you.",
+      "Spread your wings and catch a good breeze today!",
+      "{pokemon} used Tailwind. Smooth flying ahead!",
+      "Up, up and away! {pokemon} is soaring with you.",
     ],
     milestone1h: [
       "One hour! {pokemon} does a loop-the-loop.",
@@ -528,9 +563,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} says every flyer needs a perch. Quick break?",
     ],
     clockOut: [
-      "That's enough, {trainer}. Glide home and rest. You flew {hours}h today.",
-      "That's enough, {trainer}. Time to roost. {pokemon} loved flying with you!",
-      "That's enough, {trainer}. {hours}h in the sky! Fold your wings and relax.",
+      "Glide home and rest. You flew {hours}h today.",
+      "Time to roost. {pokemon} loved flying with you!",
+      "{hours}h in the sky! Fold your wings and relax.",
     ],
     levelUp: [
       "Level up! {pokemon} does a victory lap in the sky!",
@@ -551,9 +586,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} smiles knowingly. Ready to focus your mind?",
     ],
     clockIn: [
-      "{trainer}, I choose you! {pokemon} used Calm Mind. Clear focus starts now!",
-      "{trainer}, I choose you! {pokemon} foresaw a good day. Let's make it real!",
-      "{trainer}, I choose you! Breathe in, focus up. Your mind is ready!",
+      "{pokemon} used Calm Mind. Clear focus starts now!",
+      "{pokemon} foresaw a good day. Let's make it real!",
+      "Breathe in, focus up. Your mind is ready!",
     ],
     milestone1h: [
       "One hour! {pokemon} predicted this exact moment.",
@@ -576,9 +611,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} gently levitates a snack over. Break time?",
     ],
     clockOut: [
-      "That's enough, {trainer}. Rest your mind. You focused for {hours}h today.",
-      "That's enough, {trainer}. {pokemon} senses a well-earned break. Great work!",
-      "That's enough, {trainer}. {hours}h of clear thinking! Let your mind wander now.",
+      "Rest your mind. You focused for {hours}h today.",
+      "{pokemon} senses a well-earned break. Great work!",
+      "{hours}h of clear thinking! Let your mind wander now.",
     ],
     levelUp: [
       "Level up! {pokemon} saw this coming all along!",
@@ -599,9 +634,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} wiggles its antennae. Ready to get busy?",
     ],
     clockIn: [
-      "{trainer}, I choose you! Busy as a bee! Let's buzz through today's work.",
-      "{trainer}, I choose you! {pokemon} used String Shot on distractions. Go!",
-      "{trainer}, I choose you! Small steps add up. {pokemon} is buzzing for you!",
+      "Busy as a bee! Let's buzz through today's work.",
+      "{pokemon} used String Shot on distractions. Go!",
+      "Small steps add up. {pokemon} is buzzing for you!",
     ],
     milestone1h: [
       "One hour! {pokemon} adds a cell to the hive.",
@@ -624,9 +659,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} buzzes gently. How about a short break?",
     ],
     clockOut: [
-      "That's enough, {trainer}. Back to the nest and rest. You did {hours}h today.",
-      "That's enough, {trainer}. {pokemon} chirps goodbye. Busy, happy work today!",
-      "That's enough, {trainer}. {hours}h of buzzing along! Time to cocoon and relax.",
+      "Back to the nest and rest. You did {hours}h today.",
+      "{pokemon} chirps goodbye. Busy, happy work today!",
+      "{hours}h of buzzing along! Time to cocoon and relax.",
     ],
     levelUp: [
       "Level up! {pokemon} flutters with joy!",
@@ -647,9 +682,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} gives a firm nod. Ready to build something?",
     ],
     clockIn: [
-      "{trainer}, I choose you! Steady and solid, just like {pokemon}. Let's go!",
-      "{trainer}, I choose you! {pokemon} used Rock Polish. You're ready to roll!",
-      "{trainer}, I choose you! One stone at a time builds something great!",
+      "Steady and solid, just like {pokemon}. Let's go!",
+      "{pokemon} used Rock Polish. You're ready to roll!",
+      "One stone at a time builds something great!",
     ],
     milestone1h: [
       "One hour! {pokemon} sets the first stone.",
@@ -672,9 +707,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} sits like a statue. Rest with it for a bit?",
     ],
     clockOut: [
-      "That's enough, {trainer}. Rest easy. You stood strong for {hours}h today.",
-      "That's enough, {trainer}. {pokemon} settles in for the night. Rock-solid work!",
-      "That's enough, {trainer}. {hours}h, steady as a boulder. Go take a load off.",
+      "Rest easy. You stood strong for {hours}h today.",
+      "{pokemon} settles in for the night. Rock-solid work!",
+      "{hours}h, steady as a boulder. Go take a load off.",
     ],
     levelUp: [
       "Level up! {pokemon} rumbles with joy!",
@@ -695,9 +730,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} floats through the wall to say hi!",
     ],
     clockIn: [
-      "{trainer}, I choose you! Boo! {pokemon} is here to haunt your to-do list.",
-      "{trainer}, I choose you! {pokemon} used Curse... on procrastination only!",
-      "{trainer}, I choose you! Spooky focus mode on! {pokemon} floats beside you.",
+      "Boo! {pokemon} is here to haunt your to-do list.",
+      "{pokemon} used Curse... on procrastination only!",
+      "Spooky focus mode on! {pokemon} floats beside you.",
     ],
     milestone1h: [
       "One hour! {pokemon} does a happy phantom twirl.",
@@ -720,9 +755,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} drifts in circles. Float away for a short break?",
     ],
     clockOut: [
-      "That's enough, {trainer}. Vanish and rest! You haunted {hours}h of work today.",
-      "That's enough, {trainer}. {pokemon} fades away with a friendly wave. Nice work!",
-      "That's enough, {trainer}. {hours}h logged! Go rest; {pokemon} will guard the ball.",
+      "Vanish and rest! You haunted {hours}h of work today.",
+      "{pokemon} fades away with a friendly wave. Nice work!",
+      "{hours}h logged! Go rest; {pokemon} will guard the ball.",
     ],
     levelUp: [
       "Level up! {pokemon} spooks the room with joy!",
@@ -743,9 +778,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} lets out a friendly roar. Ready, {trainer}?",
     ],
     clockIn: [
-      "{trainer}, I choose you! {pokemon} used Dragon Dance. You're powered up!",
-      "{trainer}, I choose you! Bold and steady, like a dragon. Let's soar!",
-      "{trainer}, I choose you! {pokemon} roars with pride. Today is yours!",
+      "{pokemon} used Dragon Dance. You're powered up!",
+      "Bold and steady, like a dragon. Let's soar!",
+      "{pokemon} roars with pride. Today is yours!",
     ],
     milestone1h: [
       "One hour! {pokemon} adds a gem to your hoard.",
@@ -768,9 +803,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} yawns a tiny puff of smoke. Short break?",
     ],
     clockOut: [
-      "That's enough, {trainer}. Return to your lair and rest. You did {hours}h today.",
-      "That's enough, {trainer}. Even dragons nap on their treasure. Great work!",
-      "That's enough, {trainer}. {hours}h of legendary effort! {pokemon} is impressed.",
+      "Back to your lair for some rest. You did {hours}h today.",
+      "Even dragons nap on their treasure. Great work!",
+      "{hours}h of legendary effort! {pokemon} is impressed.",
     ],
     levelUp: [
       "Level up! {pokemon} roars to the sky!",
@@ -791,9 +826,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} twirls hello. Ready for a charming day?",
     ],
     clockIn: [
-      "{trainer}, I choose you! A sprinkle of fairy dust, and off you go!",
-      "{trainer}, I choose you! {pokemon} used Sweet Kiss. You're going to shine!",
-      "{trainer}, I choose you! Let's make today a little magical, together!",
+      "A sprinkle of fairy dust, and off you go!",
+      "{pokemon} used Sweet Kiss. You're going to shine!",
+      "Let's make today a little magical, together!",
     ],
     milestone1h: [
       "One hour! {pokemon} gives you a gold star.",
@@ -816,9 +851,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} pours you some tea. Short break together?",
     ],
     clockOut: [
-      "That's enough, {trainer}. Rest and sparkle. You put in {hours}h today.",
-      "That's enough, {trainer}. {pokemon} twirls goodbye. Magical work today!",
-      "That's enough, {trainer}. {hours}h of charm and care! Go treat yourself.",
+      "Rest and sparkle. You put in {hours}h today.",
+      "{pokemon} twirls goodbye. Magical work today!",
+      "{hours}h of charm and care! Go treat yourself.",
     ],
     levelUp: [
       "Level up! {pokemon} showers you in sparkles!",
@@ -839,9 +874,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} gleams in the light. Ready to forge ahead?",
     ],
     clockIn: [
-      "{trainer}, I choose you! {pokemon} used Iron Defense. Let's build something strong!",
-      "{trainer}, I choose you! Steady as steel! {pokemon} is ready when you are.",
-      "{trainer}, I choose you! Gears turning, focus sharp. Let's get to work!",
+      "{pokemon} used Iron Defense. Let's build something strong!",
+      "Steady as steel! {pokemon} is ready when you are.",
+      "Gears turning, focus sharp. Let's get to work!",
     ],
     milestone1h: [
       "One hour! {pokemon} polishes your first gear.",
@@ -864,9 +899,9 @@ export const coachLines: Record<CoachType, Record<CoachEvent, readonly string[]>
       "{pokemon} hums softly. Time for a short break?",
     ],
     clockOut: [
-      "That's enough, {trainer}. Time to cool the forge. You put in {hours}h today.",
-      "That's enough, {trainer}. {pokemon} gives a shiny salute. Sturdy work today!",
-      "That's enough, {trainer}. {hours}h, strong as iron! Go rest and recharge.",
+      "Time to cool the forge. You put in {hours}h today.",
+      "{pokemon} gives a shiny salute. Sturdy work today!",
+      "{hours}h, strong as iron! Go rest and recharge.",
     ],
     levelUp: [
       "Level up! {pokemon} rings like a bell with joy!",
@@ -900,7 +935,8 @@ export function coachTypeFor(types: readonly string[]): CoachType {
  *
  * `seed` replaces Math.random: the same seed always gives the same line.
  * Pass something that changes when you want a new line, e.g.
- * dayIndex + eventCount. The line is lines[seed mod 3].
+ * dayIndex + eventCount. The line is lines[seed mod 3]; clock in and clock out
+ * are a call from CLOCK_IN_CALLS / CLOCK_OUT_CALLS plus a type message.
  */
 export function pickCoachLine({
   types,
@@ -914,7 +950,13 @@ export function pickCoachLine({
   const lines = coachLines[coachTypeFor(types)][event];
   // Make any number a safe index: whole, non-negative, and NaN/Infinity -> 0.
   const whole = Number.isFinite(seed) ? Math.abs(Math.trunc(seed)) : 0;
-  return lines[whole % lines.length];
+  const calls = event === "clockIn" ? CLOCK_IN_CALLS : event === "clockOut" ? CLOCK_OUT_CALLS : null;
+  if (!calls) return lines[whole % lines.length];
+  // Two parts: the call changes with every seed, and the type message every
+  // calls.length seeds, so the seeds 0, 1, 2, … go through every combination.
+  const call = calls[whole % calls.length];
+  const message = lines[Math.floor(whole / calls.length) % lines.length];
+  return `${call} ${message}`;
 }
 
 /**

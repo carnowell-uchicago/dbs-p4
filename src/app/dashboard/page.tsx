@@ -8,9 +8,10 @@ import { coachEventFor } from "@/lib/coach-event";
 import { fillCoachLine, pickCoachLine, type CoachEvent } from "@/lib/coach-lines";
 import { DAILY_EPOCH, dailyPokemonId } from "@/lib/daily-pokemon";
 import { avatarOf, effectiveTimeZone, getProfile, getSessionsBetween, getTotalXp, requireUser, todayKey } from "@/lib/data";
-import { daysBetween, listDates, weekStart } from "@/lib/dates";
+import { addDays, daysBetween, listDates, weekStart } from "@/lib/dates";
 import { formatDay, formatDuration } from "@/lib/format";
 import { getPokemon, PokemonNotFoundError, type Pokemon } from "@/lib/pokeapi";
+import { startOfDay } from "@/lib/time";
 import { levelFromXp } from "@/lib/xp";
 import { AddTimeForm } from "./AddTimeForm";
 import { ClockPanel } from "./ClockPanel";
@@ -65,10 +66,10 @@ async function Dashboard() {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Wide screens: today's coach card on the left, the battle on the right. Phones: the
-          battle first (so Clock in is at the top), then the card. */}
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.3fr)]">
-        <div className="min-w-0 lg:col-start-2 lg:row-start-1">
+      {/* Wide screens: the coach card and this week on the left; the battle, today's sessions
+          and "add time" on the right. Phones: the right column first (Clock in at the top). */}
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,2.4fr)]">
+        <div className="flex min-w-0 flex-col gap-6 lg:col-start-2 lg:row-start-1">
           <ClockPanel
             running={running ? { id: running.id, clockIn: running.clock_in, note: running.note } : null}
             finishedTodayMs={finishedTodayMs}
@@ -76,6 +77,8 @@ async function Dashboard() {
             avatar={avatarOf(profile)}
             trainerName={profile.trainer_name}
             level={level}
+            todaySpans={sessions.map((s) => ({ start: Date.parse(s.clock_in), end: s.clock_out ? Date.parse(s.clock_out) : null }))}
+            dayStart={startOfDay(today, timeZone).getTime()}
             // The coach loads on its own: PokéAPI being slow or down never blocks the clock.
             coach={
               <Suspense fallback={<Skeleton className="size-24 sm:size-44" />}>
@@ -94,38 +97,83 @@ async function Dashboard() {
               </Suspense>
             }
           />
+          <div className="grid gap-6 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+            <TodaySessions sessions={sessions} timeZone={timeZone} today={today} now={now} />
+            <AddTimeForm today={today} />
+          </div>
         </div>
-        <div className="lg:col-start-1 lg:row-start-1">
+        {/* Left column: the coach card, then this week's numbers under it. */}
+        <div className="flex flex-col gap-4 lg:col-start-1 lg:row-start-1">
           <Suspense fallback={<Skeleton className="h-72 w-full" />}>
             <DailyCoachCard id={coachId} dateLabel={formatDay(today)} />
           </Suspense>
+          <WeekPanel
+            monday={monday}
+            today={today}
+            perDay={perDay}
+            todayLabel={formatDuration(finishedTodayMs + runningTodayMs)}
+            weekLabel={formatDuration(weekMs)}
+            daysLogged={daysLogged}
+          />
         </div>
-      </div>
-
-      <dl className="grid grid-cols-3 gap-3">
-        <Stat label="Today" value={formatDuration(finishedTodayMs + runningTodayMs)} />
-        <Stat label="This week" value={formatDuration(weekMs)} />
-        <Stat label="Days this week" value={`${daysLogged} / 7`} />
-      </dl>
-
-      <div className="grid gap-6 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-        <TodaySessions sessions={sessions} timeZone={timeZone} today={today} now={now} />
-        <AddTimeForm today={today} />
       </div>
     </div>
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+/** One panel: today's and this week's totals, then Mon–Sun (today highlighted, days to come as "–"). */
+function WeekPanel({
+  monday,
+  today,
+  perDay,
+  todayLabel,
+  weekLabel,
+  daysLogged,
+}: {
+  monday: string;
+  today: string;
+  perDay: number[];
+  todayLabel: string;
+  weekLabel: string;
+  daysLogged: number;
+}) {
+  const mono = { fontFamily: "var(--dp-mono)" };
   return (
-    <div className="rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) neon-panel px-4 py-3">
-      <dt className="text-xs font-bold uppercase tracking-[0.08em] text-(--dk-muted)" style={{ fontFamily: "var(--dp-mono)" }}>
-        {label}
-      </dt>
-      <dd className="neon-text mt-1 text-lg font-bold tabular-nums sm:text-xl" style={{ fontFamily: "var(--dp-display)" }}>
-        {value}
-      </dd>
-    </div>
+    <section aria-labelledby="week-h" className="neon-panel rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) px-4 py-3">
+      <h2 id="week-h" className="sr-only">
+        Your week
+      </h2>
+      <dl className="grid grid-cols-3 gap-2 border-b-2 border-(--dk-line) pb-2 lg:grid-cols-1 lg:gap-1">
+        {[
+          ["Today", todayLabel],
+          ["This week", weekLabel],
+          ["Days", `${daysLogged} / 7`],
+        ].map(([label, value]) => (
+          <div key={label} className="lg:flex lg:items-baseline lg:justify-between">
+            <dt className="text-xs font-bold uppercase tracking-[0.08em] text-(--dk-muted)" style={mono}>
+              {label}
+            </dt>
+            <dd className="neon-text text-lg font-bold tabular-nums" style={{ fontFamily: "var(--dp-display)" }}>
+              {value}
+            </dd>
+          </div>
+        ))}
+      </dl>
+      <ul className="mt-2 grid grid-cols-7 gap-1 text-center text-sm tabular-nums lg:grid-cols-1 lg:gap-0.5 lg:text-left" style={mono}>
+        {listDates(monday, addDays(monday, 6)).map((day, i) => {
+          const future = day > today;
+          return (
+            <li key={day} className={`lg:flex lg:justify-between lg:gap-2 ${day === today ? "font-bold text-(--dk-gold)" : future ? "text-(--dk-muted)" : ""}`}>
+              <span className="block">
+                {formatDay(day).split(",")[0]}
+                {day === today && <span className="sr-only"> (today)</span>}
+              </span>
+              <span className="block text-xs lg:text-sm">{future ? "–" : formatDuration(perDay[i] ?? 0)}</span>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }
 
