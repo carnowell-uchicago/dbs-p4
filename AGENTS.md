@@ -61,6 +61,7 @@ The student also has to explain everything in class: request tracing, access con
   - `time.ts`, `dates.ts`, `ranges.ts`, `timesheet.ts` (CSV)
   - `xp.ts`, `daily-pokemon.ts`, `coach-lines.ts`
   - `pokeapi.ts`
+- **Step 5 (database half) done 2026-10-27:** 4 migrations applied via MCP and saved in `supabase/migrations/`. RLS on both tables (4 own-rows policies each), anon has no grants, security advisor clean. Verified with simulated users in rolled-back transactions. **Still to do in Step 5:** install `@supabase/supabase-js`, write the Clerk-token Supabase client, confirm the student finished the Clerk ↔ Supabase integration + env vars.
 - **Supabase (in progress, student):** project ref `dxwqwpbtuizagvkawlhl`. `.mcp.json` is committed and scoped to it. The agent fixed a line break that had split the ref.
 
 **Waiting on the student:**
@@ -347,6 +348,7 @@ To help with #5, keep a short running log below. Record each time the student re
 - 2026-10-27: The student asked for a **tall-grass background** instead of plain dark. The agent's first tile had a bug (all four quadrants were identical, so there was no offset), which the agent caught and fixed. It also checked text contrast against the brightest blade.
 - 2026-10-27: The student set up the Supabase MCP. The agent caught a **line break splitting the project ref** in `.mcp.json`, which would have stopped it connecting, and fixed it.
 - 2026-10-27: The student logged in to the Supabase MCP (the agent confirmed it reaches project `dxwqwpbtuizagvkawlhl`, empty `public` schema). Reviewing the data model, the student **added two features**: optional session notes, and manual/retroactive time entries that deliberately **earn no XP**, to encourage logging live.
+- 2026-10-27: The student chose: timezone auto-detected with a saved override; live sessions timed by the **database clock** (trigger + `now()`); edits may only ever **reduce** XP; overlapping entries rejected with a message naming the conflicting session. Agent test mistake: its first overlap test used a "running" session that started at the same `now()` as the transaction, so it falsely looked like a bug; the agent re-ran it with a backdated session and it passed.
 - 2026-10-27: Agent slip: moving `fonts.ts` left the new copy staged, so it landed in an unrelated commit ("Rework the idea…"). The next commit removed the old copy; history was left as is.
 
 ---
