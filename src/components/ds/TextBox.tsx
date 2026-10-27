@@ -39,7 +39,7 @@ export function TextBox({
             {speaker}
           </p>
         )}
-        <div className="text-lg leading-snug" style={{ fontFamily: "var(--dp-pixel)" }}>
+        <div className="text-base leading-snug tracking-[0.02em]" style={{ fontFamily: "var(--dp-pixel)" }}>
           {children}
         </div>
         {action && <div className="mt-2 flex flex-wrap gap-2">{action}</div>}

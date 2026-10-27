@@ -162,7 +162,7 @@ const tiles: Tile[] = [
           Eevee grew to Lv. 13!
         </p>
         <p className="text-sm text-(--dp-muted)" style={mono}>
-          Pixelify Sans · candidate for game moments only
+          Silkscreen · the game voice (was Pixelify Sans)
         </p>
       </div>
     ),

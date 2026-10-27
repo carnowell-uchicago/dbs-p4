@@ -33,12 +33,12 @@ const doto = Doto({ subsets: ["latin"], weight: "700" });
 const kodeMono = Kode_Mono({ subsets: ["latin"] });
 
 const options = [
-  { name: "Pixelify Sans", family: pixelify.style.fontFamily, size: 18, note: "Current choice. At text size its 5 and S look alike (\"7.5\" reads as \"7.S\"), and the stepped strokes blur a, e and s." },
+  { name: "Pixelify Sans", family: pixelify.style.fontFamily, size: 18, note: "Previous choice. At text size its 5 and S look alike (\"7.5\" reads as \"7.S\"), and the stepped strokes blur a, e and s." },
   { name: "VT323", family: vt323.style.fontFamily, size: 24, note: "Old terminal font. Tall, thin and very clear; needs a larger size (24px) because it's small for its size." },
   { name: "DotGothic16", family: dotGothic.style.fontFamily, size: 18, note: "Based on Japanese handheld-era bitmap fonts: the closest to the real games' text box. Thin, airy and clear; 5 and S stay distinct." },
   { name: "Jersey 15", family: jersey.style.fontFamily, size: 22, note: "Chunky, condensed pixel sans with a big x-height. Easy to read in short lines." },
   { name: "Tiny5", family: tiny5.style.fontFamily, size: 20, note: "A 5-pixel-tall bitmap face. Crisp and bold, but like Pixelify its 5 and S are hard to tell apart." },
-  { name: "Silkscreen", family: silkscreen.style.fontFamily, size: 16, note: "Very crisp, but lower case is drawn as small capitals, so sentences read as all caps." },
+  { name: "Silkscreen (chosen)", family: silkscreen.style.fontFamily, size: 16, note: "Chosen. Very crisp, but lower case is drawn as small capitals, so sentences read as all caps." },
   { name: "Press Start 2P", family: pressStart.style.fontFamily, size: 14, note: "The classic arcade look. Wide and heavy; tiring in more than a few words." },
   { name: "Handjet", family: handjet.style.fontFamily, size: 22, note: "Pixel grid with rounded dots and many weights. Modern and friendly." },
   { name: "Doto", family: doto.style.fontFamily, size: 20, note: "Dot-matrix, like an LCD. Fun for numbers, harder for long text." },

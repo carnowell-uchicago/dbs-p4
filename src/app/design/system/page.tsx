@@ -84,11 +84,11 @@ function TypeSection() {
     ["Heading", "Oxanium · 20 · 700", <span key="h" className="text-xl font-bold uppercase tracking-[0.04em]" style={display}>This week</span>],
     ["Body", "Exo 2 · 16 · 400", <span key="b" className="text-base">You worked 6 h 40 m today.</span>],
     ["Numbers", "JetBrains Mono · 14 · 400", <span key="n" className="text-sm tabular-nums" style={mono}>9:05 AM – 3:45 PM · 6.67 h</span>],
-    ["Game voice", "Pixelify Sans · 18 · 400", <span key="p" className="text-lg" style={{ fontFamily: "var(--dp-pixel)" }}>PIKACHU is fired up!</span>],
+    ["Game voice", "Silkscreen · 16 · 400", <span key="p" className="text-base" style={{ fontFamily: "var(--dp-pixel)" }}>PIKACHU is fired up!</span>],
     ["Label", "JetBrains Mono · 12 · 700 · caps", <span key="l" className="text-xs font-bold uppercase tracking-[0.08em] text-(--dk-muted)" style={mono}>Starts on</span>],
   ];
   return (
-    <Section n={2} id="type" title="Type" caption="Neon Arcade's three faces, plus a pixel face only for things the coach or the game says.">
+    <Section n={2} id="type" title="Type" caption="Neon Arcade's three faces, plus Silkscreen only for things the coach or the game says.">
       <ul className="divide-y-2 divide-(--dk-line) rounded-(--dk-r-md) border-2 border-(--dk-line)">
         {rows.map(([role, spec, sample]) => (
           <li key={role} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-3 py-2.5">
