@@ -35,22 +35,25 @@ export function BattleScene({
 
         {/* Opponent row: plate on the left, the Clock on its platform on the right. */}
         <div className="relative grid items-center gap-4 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:p-6">
-          <div className="max-w-sm">{opponentPlate}</div>
+          <div className="relative z-30 max-w-sm">{opponentPlate}</div>
           <div className="relative justify-self-center sm:justify-self-end sm:pr-6">
-            <Platform className="-bottom-5 left-1/2 w-[110%] -translate-x-1/2" />
-            <div className="relative">{opponent}</div>
+            <Platform className="z-0 -bottom-5 left-1/2 w-[110%] -translate-x-1/2" />
+            <div className="relative z-10">{opponent}</div>
           </div>
         </div>
 
         {/* Your row: coach from behind, the Poké Ball, your spot; your plate on the right. */}
         <div className="relative grid items-end gap-4 px-4 pt-2 sm:grid-cols-[auto_minmax(0,1fr)] sm:px-6">
           <div className="relative flex items-end sm:gap-2">
-            <Platform className="bottom-2 left-[38%] w-[70%]" />
+            {/* Layers, bottom to top: ground (z-0), coach (z-10), your trainer (z-20), your
+                plate (z-30). Positioned things paint over normal ones, so every layer gets an
+                explicit z-index and the ground can never cover the trainer or the plate. */}
+            <Platform className="z-0 bottom-2 left-[38%] w-[70%]" />
             {/* On phones the coach is tucked against the edge, like the games' back sprites. */}
-            <div className="relative -mb-1 -ml-3 shrink-0 sm:ml-0">{coach}</div>
-            <div className="relative pb-4">{stage}</div>
+            <div className="relative z-10 -mb-1 -ml-3 shrink-0 sm:ml-0">{coach}</div>
+            <div className="relative z-20 pb-4">{stage}</div>
           </div>
-          <div className="w-full pb-4 sm:w-full sm:max-w-72 sm:justify-self-end">{playerPlate}</div>
+          <div className="relative z-30 w-full pb-4 sm:w-full sm:max-w-72 sm:justify-self-end">{playerPlate}</div>
         </div>
       </div>
       <div className="border-t-2 border-(--dk-edge) bg-(--dk-panel) p-3">{line}</div>

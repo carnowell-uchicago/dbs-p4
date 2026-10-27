@@ -55,7 +55,7 @@ export function ProfileForm({
 
       <div className="neon-panel flex min-w-0 flex-col gap-5 rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) p-5">
         <Field
-          label="What should your coaches call you?"
+          label="Your trainer name (your coaches call you this)"
           name="trainerName"
           value={name}
           onChange={(e) => setName(e.target.value)}
