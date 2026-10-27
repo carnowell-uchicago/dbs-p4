@@ -233,6 +233,9 @@ To help with #5, keep a short running log below. Record each time the student re
 ### Agentic workflow log
 - _(add entries as they happen: date, what the student stopped or caught, what changed)_
 - 2026-10-20: The student chose to do Step 4 (Clerk) before Steps 1–3. The agent pointed out that `clerk init` would scaffold into a subfolder of a "bare" directory, so the Next.js app was created at the repo root first. The student picked Clerk app `app_3Kyu70z56nAtnZonNsGQNtTOLgn` in the Clerk Dashboard. Steps 1–3 (idea, API, data model) still need to be done before any Supabase work.
+- 2026-10-27: The student asked for **more real gameplay images** on the mood board. Bulbagarden blocks automated downloads; the agent did not try to get around that and used Wikipedia/Commons instead (4 more references).
+- 2026-10-27: The student asked the agent to **use subagents for background work** while the design is still open. The agent kept decision-dependent work (data model, database, UI) out of it and launched two worktree agents: pure time/XP/daily-Pokémon logic with tests, and a cached server-side PokéAPI module.
+- 2026-10-27: Agent mistake, caught by the agent and fixed: a `git add -A` picked up the agents' `.claude/worktrees/` folders (gitlinks only, no file contents). Fixed forward in a new commit (no history rewrite), and the folder is now in `.gitignore`. **Lesson: stage explicit paths while worktrees exist.**
 
 ---
 
