@@ -111,3 +111,13 @@ export async function addManualSession(_prev: ActionResult, formData: FormData):
   const length = formatDuration(clockOut.getTime() - clockIn.getTime());
   return { ok: true, message: `Added ${length} on ${formatDay(date)}. Manual time counts toward your hours, not XP.` };
 }
+
+export async function deleteSession(sessionId: string): Promise<ActionResult> {
+  const { supabase } = await requireUser();
+  // RLS only lets you delete your own rows; someone else's id simply matches nothing.
+  const { data, error } = await supabase.from("work_sessions").delete().eq("id", sessionId).select("id");
+  if (error) return { ok: false, message: "Couldn't delete that session. Please try again." };
+  if (data.length === 0) return { ok: false, message: "That session was already deleted." };
+  refresh();
+  return { ok: true, message: "Session deleted." };
+}
