@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { CoachFromBehind } from "@/components/ds/BattleScene";
+import { CoachCard } from "@/components/ds/CoachCard";
 import { Skeleton } from "@/components/ds/Skeleton";
 import { TextBox } from "@/components/ds/TextBox";
 import { coachEventFor } from "@/lib/coach-event";
@@ -8,7 +9,7 @@ import { fillCoachLine, pickCoachLine, type CoachEvent } from "@/lib/coach-lines
 import { DAILY_EPOCH, dailyPokemonId } from "@/lib/daily-pokemon";
 import { avatarOf, effectiveTimeZone, getProfile, getSessionsBetween, getTotalXp, requireUser, todayKey } from "@/lib/data";
 import { daysBetween, listDates, weekStart } from "@/lib/dates";
-import { formatDuration } from "@/lib/format";
+import { formatDay, formatDuration } from "@/lib/format";
 import { getPokemon, PokemonNotFoundError, type Pokemon } from "@/lib/pokeapi";
 import { levelFromXp } from "@/lib/xp";
 import { AddTimeForm } from "./AddTimeForm";
@@ -64,31 +65,42 @@ async function Dashboard() {
 
   return (
     <div className="flex flex-col gap-6">
-      <ClockPanel
-        running={running ? { id: running.id, clockIn: running.clock_in, note: running.note } : null}
-        finishedTodayMs={finishedTodayMs}
-        timeZone={timeZone}
-        avatar={avatarOf(profile)}
-        trainerName={profile.trainer_name}
-        level={level}
-        // The coach loads on its own: PokéAPI being slow or down never blocks the clock.
-        coach={
-          <Suspense fallback={<Skeleton className="size-24 sm:size-44" />}>
-            <Coach id={coachId} />
+      {/* Wide screens: today's coach card on the left, the battle on the right. Phones: the
+          battle first (so Clock in is at the top), then the card. */}
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.3fr)]">
+        <div className="min-w-0 lg:col-start-2 lg:row-start-1">
+          <ClockPanel
+            running={running ? { id: running.id, clockIn: running.clock_in, note: running.note } : null}
+            finishedTodayMs={finishedTodayMs}
+            timeZone={timeZone}
+            avatar={avatarOf(profile)}
+            trainerName={profile.trainer_name}
+            level={level}
+            // The coach loads on its own: PokéAPI being slow or down never blocks the clock.
+            coach={
+              <Suspense fallback={<Skeleton className="size-24 sm:size-44" />}>
+                <Coach id={coachId} />
+              </Suspense>
+            }
+            line={
+              <Suspense fallback={<TextBox speaker="Today's coach">…</TextBox>}>
+                <CoachLine
+                  id={coachId}
+                  event={event}
+                  seed={daysBetween(DAILY_EPOCH, today) + sessions.length}
+                  trainer={profile.trainer_name}
+                  hours={(finishedTodayMs + runningTodayMs) / 3_600_000}
+                />
+              </Suspense>
+            }
+          />
+        </div>
+        <div className="lg:col-start-1 lg:row-start-1">
+          <Suspense fallback={<Skeleton className="h-72 w-full" />}>
+            <DailyCoachCard id={coachId} dateLabel={formatDay(today)} />
           </Suspense>
-        }
-        line={
-          <Suspense fallback={<TextBox speaker="Today's coach">…</TextBox>}>
-            <CoachLine
-              id={coachId}
-              event={event}
-              seed={daysBetween(DAILY_EPOCH, today) + sessions.length}
-              trainer={profile.trainer_name}
-              hours={(finishedTodayMs + runningTodayMs) / 3_600_000}
-            />
-          </Suspense>
-        }
-      />
+        </div>
+      </div>
 
       <dl className="grid grid-cols-3 gap-3">
         <Stat label="Today" value={formatDuration(finishedTodayMs + runningTodayMs)} />
@@ -147,6 +159,30 @@ async function CoachLine({ id, event, seed, trainer, hours }: { id: number; even
     <TextBox speaker={pokemon.displayName} live="polite">
       {text}
     </TextBox>
+  );
+}
+
+/** The front page's "Today's coach" card, with the coach's Pokédex entry in its text box. */
+async function DailyCoachCard({ id, dateLabel }: { id: number; dateLabel: string }) {
+  const { pokemon } = await loadCoach(id);
+  if (!pokemon) {
+    return (
+      <section aria-label="Today's coach" className="neon-panel rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) p-4">
+        <TextBox tone="error" speaker="Today's coach" live="polite" action={<RetryButton />}>
+          PokéAPI isn&apos;t answering, so today&apos;s coach card can&apos;t load. Your clock still works.
+        </TextBox>
+      </section>
+    );
+  }
+  return (
+    <CoachCard
+      number={pokemon.id}
+      name={pokemon.displayName}
+      types={pokemon.types}
+      sprite={pokemon.gen4Sprite ?? pokemon.sprite}
+      dateLabel={dateLabel}
+      line={pokemon.genus ? `${pokemon.genus}. ${pokemon.flavorText}` : pokemon.flavorText}
+    />
   );
 }
 

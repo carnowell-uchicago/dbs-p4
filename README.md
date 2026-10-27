@@ -9,7 +9,7 @@ A work-hours log for remote workers and students, played like a Pokémon battle.
 - **Timesheets.** Export 1 week, 2 weeks or a custom range (anchored on its first or last day) as CSV, or print it.
 - **Coach Pokédex.** Search the 151 and see which coaches have trained you, and on which days.
 
-**Live:** _Vercel URL goes here_ · **Course:** Design, Build, Ship (MPCS 51238), Assignment 4
+**Live:** https://dbs-p4.vercel.app · **Course:** Design, Build, Ship (MPCS 51238), Assignment 4
 
 ## Stack
 
@@ -77,7 +77,7 @@ Clocking in never depends on PokéAPI.
 ## Tests
 
 - `npm run test:unit`: 93 Vitest tests covering time zones and DST, ranges, the timesheet and CSV, XP, the daily coach, coach lines, the PokéAPI helper and the Pokédex search.
-- `npm run test:e2e`: one Playwright test, **two users can't see each other's sessions** ([`e2e/rls.spec.ts`](e2e/rls.spec.ts)). Users A and B each add a session with a secret note on the same day; each must see their own note and not the other's.
+- `npm run test:e2e` (or `PLAYWRIGHT_BASE_URL=https://dbs-p4.vercel.app npm run test:e2e` to test the live site): one Playwright test, **two users can't see each other's sessions** ([`e2e/rls.spec.ts`](e2e/rls.spec.ts)). Users A and B each add a session with a secret note on the same day; each must see their own note and not the other's.
   - **Watched failing first.** With the read policy changed to `using (true)`, user B's save was refused with "That overlaps your manual entry … 10:00", which was **user A's** session: B's queries could read A's rows ([`docs/test-runs/rls-broken-FAILED.txt`](docs/test-runs/rls-broken-FAILED.txt)).
   - **Then passing** after restoring the policy ([`docs/test-runs/rls-fixed-PASSED.txt`](docs/test-runs/rls-fixed-PASSED.txt)).
 
