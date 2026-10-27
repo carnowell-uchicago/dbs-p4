@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
-import { fontVars } from "../fonts";
+import { fontVars } from "@/components/ds/fonts";
 import { references, sprites } from "./references";
 
 export const metadata: Metadata = {
