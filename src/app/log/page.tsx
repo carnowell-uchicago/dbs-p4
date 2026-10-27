@@ -3,10 +3,13 @@ import { Suspense } from "react";
 import { Skeleton } from "@/components/ds/Skeleton";
 import { TextBox } from "@/components/ds/TextBox";
 import { effectiveTimeZone, getProfile, getSessionsBetween, requireUser, todayKey } from "@/lib/data";
-import { formatDay } from "@/lib/format";
+import { formatClock, formatDay, formatDuration } from "@/lib/format";
 import { buildRange, type DateRange } from "@/lib/ranges";
-import { splitSessionByDay } from "@/lib/time";
+import { splitSessionByDay, toDateKey } from "@/lib/time";
 import { buildTimesheet, toCsv } from "@/lib/timesheet";
+import { Badge } from "@/components/ds/Tag";
+import { SessionActions } from "@/app/dashboard/SessionActions";
+import { editableSession } from "@/app/dashboard/TodaySessions";
 import { ExportButtons } from "./ExportButtons";
 import { RangeForm } from "./RangeForm";
 
@@ -128,6 +131,45 @@ async function Timesheet({ searchParams }: { searchParams: PageProps<"/log">["se
         </div>
         {rows.length === 0 && <p className="mt-3 text-sm text-(--dk-muted)">No time logged in this range. Try a different week, or clock in from the dashboard.</p>}
       </section>
+
+      {rows.length > 0 && (
+        <section aria-labelledby="sessions-h" className="neon-panel rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) p-4 print:border-0 print:p-0">
+          <h2 id="sessions-h" className="text-sm font-bold uppercase tracking-[0.08em]" style={{ fontFamily: "var(--dp-display)" }}>
+            Sessions in this range
+          </h2>
+          <p className="mt-1 text-sm text-(--dk-muted) print:hidden">Fix a time or a note, or delete a session. The table above updates when you save.</p>
+          <ul className="mt-3 divide-y-2 divide-(--dk-line)">
+            {rows.map((s) => {
+              const start = new Date(s.clock_in);
+              const end = s.clock_out ? new Date(s.clock_out) : null;
+              const range = `${formatClock(start, timeZone)} – ${end ? formatClock(end, timeZone) : "now"}`;
+              const length = formatDuration((end ?? now).getTime() - start.getTime());
+              const day = formatDay(toDateKey(start, timeZone));
+              return (
+                <li key={s.id} className="flex items-start gap-3 py-2 text-sm">
+                  <div className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <span className="w-24 shrink-0 text-(--dk-muted) print:text-black" style={mono}>
+                      {day}
+                    </span>
+                    <span className="tabular-nums" style={mono}>
+                      {range}
+                    </span>
+                    <span className="text-(--dk-muted) print:text-black" style={mono}>
+                      {length}
+                    </span>
+                    {end === null && <Badge kind="today">Running</Badge>}
+                    {s.source === "manual" && <Badge kind="new">Manual · no XP</Badge>}
+                    {s.note && <span className="basis-full text-(--dk-muted) print:text-black">{s.note}</span>}
+                  </div>
+                  <div className="print:hidden">
+                    <SessionActions session={editableSession(s, timeZone, now, `${day}, ${range} (${length})`)} xp={s.xp_minutes ?? 0} />
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }

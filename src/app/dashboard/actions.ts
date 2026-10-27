@@ -121,3 +121,54 @@ export async function deleteSession(sessionId: string): Promise<ActionResult> {
   refresh();
   return { ok: true, message: "Session deleted." };
 }
+
+/** "2026-10-27T09:05" (a datetime-local value) -> that wall-clock moment in `timeZone`, or null. */
+function fromLocalInput(value: FormDataEntryValue | null, timeZone: string): Date | null {
+  const [date, time] = String(value ?? "").split("T");
+  if (!date || !time || !isValidDateKey(date) || !isValidTime(time.slice(0, 5))) return null;
+  return atWallClock(date, time.slice(0, 5), timeZone);
+}
+
+/**
+ * Edit a session's times and note. A running session can only change its start and note:
+ * its end comes from the database clock when you clock out. For live sessions the
+ * database keeps the recorded window, so edits can lower XP but never raise it.
+ */
+export async function updateSession(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+  const { supabase } = await requireUser();
+  const timeZone = await effectiveTimeZone(await getProfile(supabase));
+  const id = String(formData.get("id") ?? "");
+  const running = formData.get("running") === "true";
+  const note = cleanNote(formData.get("note"));
+  if (note instanceof Error) return { ok: false, message: note.message };
+
+  const start = fromLocalInput(formData.get("start"), timeZone);
+  if (!start) return { ok: false, message: "Enter a start date and time." };
+  const end = running ? null : fromLocalInput(formData.get("end"), timeZone);
+  if (!running && !end) return { ok: false, message: "Enter an end date and time." };
+  const now = new Date();
+  if (start > now) return { ok: false, message: "A session can't start in the future." };
+  if (end && end <= start) return { ok: false, message: "The end has to be after the start." };
+  if (end && end > now) return { ok: false, message: "A session can't end in the future." };
+
+  // Same overlap rule as adding time, ignoring the session being edited.
+  const overlaps = (await getOverlapping(supabase, start, end ?? now)).filter((s) => s.id !== id);
+  if (overlaps.length > 0) {
+    const list = overlaps.map((s) => describeSession(s, timeZone)).join("; and ");
+    return { ok: false, message: `That overlaps ${list}. Pick a time outside it.` };
+  }
+
+  const changes = running
+    ? { clock_in: start.toISOString(), note }
+    : { clock_in: start.toISOString(), clock_out: end!.toISOString(), note };
+  // RLS limits this to your own rows: someone else's id matches nothing.
+  const { data, error } = await supabase.from("work_sessions").update(changes).eq("id", id).select("id");
+  if (error) {
+    if (error.code === EXCLUSION_VIOLATION) return { ok: false, message: "That overlaps time you've already logged." };
+    if (error.code === CHECK_VIOLATION) return { ok: false, message: "Those times aren't valid. Check the start and end." };
+    return { ok: false, message: "Couldn't save that change. Please try again." };
+  }
+  if (data.length === 0) return { ok: false, message: "That session no longer exists." };
+  refresh();
+  return { ok: true, message: "Session updated." };
+}
