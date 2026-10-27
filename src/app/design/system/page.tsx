@@ -13,6 +13,7 @@ import { Badge, TypeTag, typeColors, tagText } from "@/components/ds/Tag";
 import { TextBox } from "@/components/ds/TextBox";
 import { avatarOptions, defaultAvatar, TrainerAvatar, type Avatar } from "@/components/ds/TrainerAvatar";
 import { TrainerCard } from "@/components/ds/TrainerCard";
+import { brightestGrassPixel, grassBackground } from "@/components/ds/textures";
 import { colors, hex, paletteVars, radii, spacing } from "@/components/ds/tokens";
 import { WatchTimer } from "@/components/ds/WatchTimer";
 import { XpBar } from "@/components/ds/XpBar";
@@ -70,6 +71,17 @@ function ColorSection() {
           );
         })}
       </ul>
+      <div className="mt-3 flex items-center gap-3 rounded-(--dk-r-md) border-2 border-(--dk-line) bg-(--dk-panel) p-2">
+        <span className="size-16 shrink-0 rounded-(--dk-r-sm) border-2 border-(--dk-line)" style={grassBackground} />
+        <p className="text-[12px] leading-snug" style={mono}>
+          <span className="font-bold">Tall grass · page background</span>
+          <br />
+          <span className="text-(--dk-muted)">
+            Brightest blade {brightestGrassPixel()}: muted {formatRatio(contrastRatio(hex("--dk-muted"), brightestGrassPixel()))}, ice{" "}
+            {formatRatio(contrastRatio(hex("--dk-ice"), brightestGrassPixel()))}, sky {formatRatio(contrastRatio(hex("--dk-sky"), brightestGrassPixel()))}
+          </span>
+        </p>
+      </div>
       <p className="mt-3 text-[12px] text-(--dk-muted)" style={mono}>
         Clock button label: void on red {formatRatio(contrastRatio(hex("--dk-void"), hex("--dk-red")))} · LCD digits{" "}
         {formatRatio(contrastRatio(hex("--dk-lcd-ink"), hex("--dk-lcd")))}
@@ -363,7 +375,7 @@ function UiStatesSection() {
 export default function DuskDesignSystem() {
   return (
     <div
-      style={paletteVars}
+      style={{ ...paletteVars, ...grassBackground }}
       className={`${fontVars} flex-1 bg-(--dk-void) text-(--dk-ice) [color-scheme:dark] selection:bg-(--dk-sky) selection:text-(--dk-void)`}
     >
       <main className="mx-auto w-full max-w-[88rem] px-4 py-8 sm:px-8 sm:py-10" style={{ fontFamily: "var(--dp-body)" }}>
@@ -376,7 +388,7 @@ export default function DuskDesignSystem() {
             <span className="text-(--dk-muted)"> · </span>Design System
           </h1>
           <p className="max-w-2xl text-(--dk-muted)">
-            Neon Arcade&apos;s dark grid, lit with a handheld game&apos;s colours. The watch red is the one accent, worn by the
+            Neon Arcade&apos;s neon over the games&apos; tall grass at dusk. The watch red is the one accent, worn by the
             Poké Ball clock button; the coach speaks in the game&apos;s text box.
           </p>
         </header>

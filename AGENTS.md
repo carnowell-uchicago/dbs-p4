@@ -73,6 +73,7 @@ The student also has to explain everything in class: request tracing, access con
   - **Coach dialogue:** the coach talks to the user in **game-style text boxes**. The lines depend on **what kind of Pokémon it is** (its type), and on what's happening (clock in, clock out, milestones, level-up).
   - **Timesheet export:** generate a log for **1 week**, **2 weeks**, or a **custom** range. The user picks **either the start or the end date**, and the other end is calculated.
 - **Theme decision (2026-10-27): design the dusk direction (B) first.** Clock in is red, like the watch button and/or a Poké Ball. Pixel font must be a Google Font; the student chose **Silkscreen** after comparing ten on `/design/fonts` (Pixelify Sans made 5 and S look alike).
+- **Background (2026-10-27):** the student asked for a dark tall-grass background instead of plain black: `src/components/ds/textures.ts` (pixel tile under a 45% navy wash; text still passes AA on the brightest blade).
 - **Theme:** a spinoff of **Neon Arcade** (from `~/projects/p2`, tokens in `src/components/ds/neon-arcade/tokens.ts`) using **Pokémon Diamond/Pearl daytime colours**. Process: **mood board first (`/design/mood-board`), then a design system**. The student approves each before any app UI is built on them.
 - **Extending Assignment 3, or starting new?** Starting a new project.
 - **External API:** PokéAPI, `https://pokeapi.co/api/v2/`. No key needed. Read-only (GET). Specific endpoints are TBD until the tool idea is chosen.

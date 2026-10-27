@@ -15,6 +15,7 @@ import {
 } from "next/font/google";
 import { fontVars } from "@/components/ds/fonts";
 import { TextBox } from "@/components/ds/TextBox";
+import { grassBackground } from "@/components/ds/textures";
 import { paletteVars } from "@/components/ds/tokens";
 
 export const metadata: Metadata = { title: "Pixel font options · Dusk" };
@@ -55,7 +56,7 @@ const mono = { fontFamily: "var(--dp-mono)" };
 
 export default function FontOptions() {
   return (
-    <div style={paletteVars} className={`${fontVars} flex-1 bg-(--dk-void) text-(--dk-ice) [color-scheme:dark]`}>
+    <div style={{ ...paletteVars, ...grassBackground }} className={`${fontVars} flex-1 bg-(--dk-void) text-(--dk-ice) [color-scheme:dark]`}>
       <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-8 sm:py-10" style={{ fontFamily: "var(--dp-body)" }}>
         <header className="flex flex-col gap-3 border-b-2 border-(--dk-line) pb-6">
           <Link href="/design/system" className="self-start text-sm text-(--dk-diamond) underline underline-offset-4 hover:text-(--dk-ice)" style={mono}>
