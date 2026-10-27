@@ -65,7 +65,12 @@ The student also has to explain everything in class: request tracing, access con
 
 > Leave these blank until the student decides. Update this section as soon as a decision is made.
 
-- **Tool / app idea:** _TBD (student decides in Step 1)_
+- **Tool / app idea (chosen 2026-10-27):** a **remote-work hours log**, mainly for people who need to keep their own record of hours (it also works for study hours), themed as a Pokémon companion.
+  - **Clock in / clock out** must be fast and obvious: one primary action.
+  - **Daily Pokémon:** each day you log in, you get that day's Pokémon. It's the **same Pokémon for everyone that day**, drawn at random from the original Pokédex, with **no repeats until all have been used**, then a new cycle. (Assumed #1–151 until the student confirms.)
+  - **Active Pokémon:** the user picks one of their Pokémon as active. Hours worked earn it **XP**, and it **levels up** after it has been active long enough.
+  - **Timesheet export:** generate a log for **1 week**, **2 weeks**, or a **custom** range. The user picks **either the start or the end date**, and the other end is calculated.
+- **Theme:** a spinoff of **Neon Arcade** (from `~/projects/p2`, tokens in `src/components/ds/neon-arcade/tokens.ts`) using **Pokémon Diamond/Pearl daytime colours**. Process: **mood board first (`/design/mood-board`), then a design system**. The student approves each before any app UI is built on them.
 - **Extending Assignment 3, or starting new?** Starting a new project.
 - **External API:** PokéAPI, `https://pokeapi.co/api/v2/`. No key needed. Read-only (GET). Specific endpoints are TBD until the tool idea is chosen.
 - **Sample response notes** (checked 2026-10-20):
