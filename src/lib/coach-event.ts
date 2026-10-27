@@ -3,7 +3,7 @@
 import type { CoachEvent } from "./coach-lines";
 
 const HOUR = 60 * 60 * 1000;
-/** A clock-out this recent still counts as "just clocked out". */
+/** A clock-in or clock-out this recent still counts as "just happened". */
 export const JUST_FINISHED_MS = 10 * 60 * 1000;
 
 export function coachEventFor({
@@ -18,6 +18,8 @@ export function coachEventFor({
   leveledUpOnLastSession: boolean;
 }): CoachEvent {
   if (runningSinceMs !== null) {
+    // "{trainer}, I choose you!" right after every clock-in, even late in the day.
+    if (runningSinceMs <= JUST_FINISHED_MS) return "clockIn";
     if (todayMs >= 8 * HOUR) return "milestone8h";
     if (runningSinceMs >= 2 * HOUR) return "longStretch";
     if (todayMs >= 4 * HOUR) return "milestone4h";

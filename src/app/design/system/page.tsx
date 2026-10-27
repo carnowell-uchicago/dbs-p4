@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ds/Button";
 import { ClockButton } from "@/components/ds/ClockButton";
+import { ClockStageDemo } from "@/components/ds/ClockStageDemo";
 import { CoachCard } from "@/components/ds/CoachCard";
 import { Field } from "@/components/ds/Field";
 import { fontVars } from "@/components/ds/fonts";
@@ -170,9 +171,9 @@ function ComponentsSection() {
     <Section n={4} id="components" title="Components" caption="Live: every control here works.">
       <div className="grid gap-4 md:grid-cols-[auto_minmax(0,1fr)]">
         <div className="flex flex-col items-center gap-4 rounded-(--dk-r-lg) border-2 border-(--dk-line) p-4">
-          <ClockButton running={false} />
-          <p className="text-[12px] text-(--dk-muted)" style={mono}>
-            Clock button · Poké Ball
+          <ClockStageDemo avatar={sampleAvatars[1]} />
+          <p className="max-w-56 text-center text-[12px] text-(--dk-muted)" style={mono}>
+            Clock stage · press the ball: the trainer comes out, press again to recall them
           </p>
         </div>
         <div className="flex min-w-0 flex-col gap-4">

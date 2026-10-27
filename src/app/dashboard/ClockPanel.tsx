@@ -2,8 +2,9 @@
 
 // The Poké Ball and the watch. The ticking is done here in the browser, but the
 // start and stop times that count are set by the database (see the trigger).
-import { useEffect, useState, useTransition } from "react";
-import { ClockButton } from "@/components/ds/ClockButton";
+import { useEffect, useOptimistic, useState, useTransition } from "react";
+import { ClockStage } from "@/components/ds/ClockStage";
+import type { Avatar } from "@/components/ds/TrainerAvatar";
 import { Field } from "@/components/ds/Field";
 import { TextBox } from "@/components/ds/TextBox";
 import { WatchTimer } from "@/components/ds/WatchTimer";
@@ -14,15 +15,22 @@ export function ClockPanel({
   running,
   finishedTodayMs,
   timeZone,
+  avatar,
+  trainerName,
 }: {
   running: { id: string; clockIn: string; note: string | null } | null;
   finishedTodayMs: number; // today's time from sessions that have ended
   timeZone: string;
+  avatar: Avatar;
+  trainerName: string;
 }) {
   const [now, setNow] = useState(() => Date.now());
   const [note, setNote] = useState(running?.note ?? "");
   const [result, setResult] = useState<ActionResult>(null);
   const [pending, startTransition] = useTransition();
+  // Flips the moment you press, so the Poké Ball animates straight away. If the server
+  // says no, React puts it back when the transition ends (and the ball plays in reverse).
+  const [out, setOut] = useOptimistic(Boolean(running));
 
   useEffect(() => {
     if (!running) return;
@@ -36,6 +44,7 @@ export function ClockPanel({
   function press() {
     setResult(null);
     startTransition(async () => {
+      setOut(!running);
       const r = running ? await clockOut(running.id, note) : await clockIn();
       if (r?.ok && !running) setNote("");
       // Success is shown by the coach and the timer; only errors need a box here.
@@ -45,16 +54,12 @@ export function ClockPanel({
 
   return (
     <section aria-label="Clock" className="flex flex-col gap-4 rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) p-4">
-      <div className="flex flex-col items-center gap-4 sm:flex-row">
-        <ClockButton running={Boolean(running)} disabled={pending} onClick={press} aria-busy={pending} />
-        <div className="w-full min-w-0 flex-1">
-          <WatchTimer
-            running={Boolean(running)}
-            elapsed={formatElapsed(runningMs)}
-            caption={running ? `since ${formatClock(running.clockIn, timeZone)} · ${todayLabel}` : `Not clocked in · ${todayLabel}`}
-          />
-        </div>
-      </div>
+      <ClockStage out={out} avatar={avatar} name={trainerName} disabled={pending} onClick={press} aria-busy={pending} />
+      <WatchTimer
+        running={Boolean(running)}
+        elapsed={formatElapsed(runningMs)}
+        caption={running ? `since ${formatClock(running.clockIn, timeZone)} · ${todayLabel}` : `Not clocked in · ${todayLabel}`}
+      />
       {running && (
         <Field
           label="What are you working on? (optional)"

@@ -107,13 +107,16 @@ export function TrainerAvatar({
   avatar,
   size = 96,
   label,
+  silhouette,
 }: {
   avatar: Avatar;
   size?: number;
   // Pass a label when the avatar carries meaning on its own; otherwise it's decorative.
   label?: string;
+  // Draw every pixel in one colour: the white/red glow of a Poké Ball release or recall.
+  silhouette?: string;
 }) {
-  const fill: Record<string, string> = {
+  const colours: Record<string, string> = {
     o: "#1a1530",
     e: "#1a1530",
     s: avatar.skin,
@@ -124,6 +127,7 @@ export function TrainerAvatar({
     c: avatar.hatColor,
     b: avatar.hatColor,
   };
+  const colourOf = (ch: string) => silhouette ?? colours[ch];
   const layers = [body, hairs[avatar.hair], hats[avatar.hat]];
   return (
     <svg
@@ -138,9 +142,9 @@ export function TrainerAvatar({
       {layers.map((layer, i) =>
         cells(layer).map(({ ch, x, y }) => (
           <g key={`${i}-${x}-${y}`}>
-            <rect x={x} y={y} width={1} height={1} fill={fill[ch]} />
+            <rect x={x} y={y} width={1} height={1} fill={colourOf(ch)} />
             {/* The brim is the hat colour, shaded. */}
-            {ch === "b" && <rect x={x} y={y} width={1} height={1} fill="#000" opacity={0.28} />}
+            {ch === "b" && !silhouette && <rect x={x} y={y} width={1} height={1} fill="#000" opacity={0.28} />}
           </g>
         )),
       )}

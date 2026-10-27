@@ -81,6 +81,8 @@ async function Dashboard() {
           running={running ? { id: running.id, clockIn: running.clock_in, note: running.note } : null}
           finishedTodayMs={finishedTodayMs}
           timeZone={timeZone}
+          avatar={avatarOf(profile)}
+          trainerName={profile.trainer_name}
         />
         <TrainerCard
           name={profile.trainer_name}

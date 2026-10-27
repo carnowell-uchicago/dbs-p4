@@ -5,15 +5,21 @@ type Props = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children"> & {
   running: boolean;
   size?: "lg" | "md" | "sm";
   force?: ForcedState;
+  // The lid swings open on its hinge (used by ClockStage while the trainer comes out or goes back).
+  open?: boolean;
 };
 
-// The hero control: a Poké Ball. Red top (the accent), white bottom, black band, and
-// the centre button carries the label. One press clocks in; the next clocks out.
-// It's the only round control in the system.
+const ink = "border-[#05070d]";
+
+// The hero control: a Poké Ball. Red lid (the accent), white base, black band, and the
+// centre button carries the label. One press clocks in; the next clocks out.
+// It's the only round control in the system. The lid and base are separate halves so the
+// lid can open; when closed they meet and their borders make the black band.
 export function ClockButton({
   running,
   size = "lg",
   force,
+  open = false,
   className = "",
   disabled,
   type = "button",
@@ -29,16 +35,28 @@ export function ClockButton({
       aria-label={label}
       disabled={disabled || force === "disabled"}
       {...forceAttr(force)}
-      className={`group relative ${dims} shrink-0 select-none overflow-hidden rounded-full border-4 border-[#05070d] transition-[box-shadow,translate,filter] duration-150 hover:shadow-[0_0_8px_var(--dk-red),0_0_28px_color-mix(in_srgb,var(--dk-red)_55%,transparent)] data-[force=hover]:shadow-[0_0_8px_var(--dk-red),0_0_28px_color-mix(in_srgb,var(--dk-red)_55%,transparent)] active:translate-y-0.5 active:brightness-90 data-[force=pressed]:translate-y-0.5 data-[force=pressed]:brightness-90 focus-visible:outline-4 focus-visible:outline-solid focus-visible:outline-offset-4 focus-visible:outline-(--dk-sky) data-[force=focus]:outline-4 data-[force=focus]:outline-solid data-[force=focus]:outline-offset-4 data-[force=focus]:outline-(--dk-sky) disabled:pointer-events-none disabled:grayscale disabled:opacity-50 ${className}`}
+      className={`group relative ${dims} shrink-0 select-none rounded-full transition-[box-shadow,translate,filter] duration-150 hover:shadow-[0_0_8px_var(--dk-red),0_0_28px_color-mix(in_srgb,var(--dk-red)_55%,transparent)] data-[force=hover]:shadow-[0_0_8px_var(--dk-red),0_0_28px_color-mix(in_srgb,var(--dk-red)_55%,transparent)] active:translate-y-0.5 active:brightness-90 data-[force=pressed]:translate-y-0.5 data-[force=pressed]:brightness-90 focus-visible:outline-4 focus-visible:outline-solid focus-visible:outline-offset-4 focus-visible:outline-(--dk-sky) data-[force=focus]:outline-4 data-[force=focus]:outline-solid data-[force=focus]:outline-offset-4 data-[force=focus]:outline-(--dk-sky) disabled:pointer-events-none disabled:grayscale disabled:opacity-50 ${open ? "disabled:grayscale-0 disabled:opacity-100" : ""} ${className}`}
       {...rest}
     >
-      <span aria-hidden className="absolute inset-x-0 top-0 h-1/2 bg-(--dk-red) group-hover:bg-(--dk-red-hot) group-data-[force=hover]:bg-(--dk-red-hot)" />
-      <span aria-hidden className="absolute inset-x-0 bottom-0 h-1/2 bg-(--dk-ball)" />
-      <span aria-hidden className="absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 bg-[#05070d]" />
-      {/* Shine on the red half. */}
-      <span aria-hidden className="absolute left-[18%] top-[12%] h-[14%] w-[24%] rotate-[-30deg] rounded-full bg-white/35" />
+      {/* Light inside the ball, seen when the lid is up. */}
       <span
-        className={`absolute left-1/2 top-1/2 flex aspect-square -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full border-4 border-[#05070d] bg-(--dk-ball) font-bold uppercase leading-tight tracking-[0.04em] ${centre} text-(--dk-void)`}
+        aria-hidden
+        className={`absolute inset-x-[12%] top-1/2 h-[30%] -translate-y-1/2 rounded-[50%] bg-white blur-[6px] transition-opacity duration-200 ${open ? "opacity-100" : "opacity-0"}`}
+      />
+      {/* Base: white bottom half. */}
+      <span aria-hidden className={`absolute inset-x-0 bottom-0 h-1/2 rounded-b-full border-4 border-t-4 ${ink} bg-(--dk-ball)`} />
+      {/* Lid: red top half, hinged at its back-left corner. */}
+      <span
+        aria-hidden
+        className={`absolute inset-x-0 top-0 h-1/2 origin-bottom-left transition-transform duration-300 ease-out ${open ? "-rotate-[50deg]" : "rotate-0"}`}
+      >
+        <span className={`absolute inset-0 rounded-t-full border-4 border-b-4 ${ink} bg-(--dk-red) group-hover:bg-(--dk-red-hot) group-data-[force=hover]:bg-(--dk-red-hot)`} />
+        {/* Shine. */}
+        <span className="absolute left-[18%] top-[24%] h-[28%] w-[24%] rotate-[-30deg] rounded-full bg-white/35" />
+      </span>
+      {/* Centre button with the label; it hides while the ball is open. */}
+      <span
+        className={`absolute left-1/2 top-1/2 flex aspect-square -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full border-4 ${ink} bg-(--dk-ball) font-bold uppercase leading-tight tracking-[0.04em] ${centre} text-(--dk-void) transition-[opacity,scale] duration-200 ${open ? "scale-75 opacity-0" : "opacity-100"}`}
         style={{ fontFamily: "var(--dp-display)" }}
       >
         {running ? (

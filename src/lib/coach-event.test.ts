@@ -11,6 +11,8 @@ describe("coachEventFor", () => {
   it("cheers when you clock in, then marks 1 h, 4 h and 8 h", () => {
     expect(coachEventFor({ ...base, runningSinceMs: 60_000, todayMs: 60_000 })).toBe("clockIn");
     expect(coachEventFor({ ...base, runningSinceMs: 0.5 * H, todayMs: 1.2 * H })).toBe("milestone1h");
+    // Just clocked in again after 5 h earlier today: still "I choose you!", not a milestone.
+    expect(coachEventFor({ ...base, runningSinceMs: 60_000, todayMs: 5 * H })).toBe("clockIn");
     expect(coachEventFor({ ...base, runningSinceMs: 1 * H, todayMs: 4.5 * H })).toBe("milestone4h");
     expect(coachEventFor({ ...base, runningSinceMs: 3 * H, todayMs: 8 * H })).toBe("milestone8h");
   });
