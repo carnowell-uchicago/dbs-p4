@@ -50,7 +50,7 @@ export function BattleScene({
             <div className="relative -mb-1 -ml-3 shrink-0 sm:ml-0">{coach}</div>
             <div className="relative pb-4">{stage}</div>
           </div>
-          <div className="w-full pb-4 sm:w-72 sm:justify-self-end">{playerPlate}</div>
+          <div className="w-full pb-4 sm:w-full sm:max-w-72 sm:justify-self-end">{playerPlate}</div>
         </div>
       </div>
       <div className="border-t-2 border-(--dk-edge) bg-(--dk-panel) p-3">{line}</div>

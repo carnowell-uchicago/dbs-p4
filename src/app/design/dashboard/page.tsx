@@ -5,6 +5,8 @@ import { avatarOptions, type Avatar } from "@/components/ds/TrainerAvatar";
 import type { Tables } from "@/lib/supabase/database.types";
 import { TodaySessions } from "@/app/dashboard/TodaySessions";
 import { BattleDemo } from "./BattleDemo";
+import { CoachCard } from "@/components/ds/CoachCard";
+import { PIKACHU } from "@/components/Landing";
 
 export const metadata: Metadata = { title: "Dashboard preview · Dusk" };
 
@@ -24,7 +26,21 @@ export default function DashboardPreview() {
       <p className="mb-4 text-xs text-(--dk-gold)" style={{ fontFamily: "var(--dp-mono)" }}>
         PREVIEW · sample data · press the Poké Ball
       </p>
-      <BattleDemo avatar={avatar} />
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.3fr)]">
+        <div className="min-w-0 lg:col-start-2 lg:row-start-1">
+          <BattleDemo avatar={avatar} />
+        </div>
+        <div className="lg:col-start-1 lg:row-start-1">
+          <CoachCard
+            number={25}
+            name="Pikachu"
+            types={["electric"]}
+            sprite={PIKACHU}
+            dateLabel="Tue, Oct 27"
+            line="Mouse Pokémon. It lives in forests with others. It stores electricity in the electric sacs on both its cheeks."
+          />
+        </div>
+      </div>
       <div className="mt-6 grid gap-6 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <TodaySessions sessions={sessions} timeZone={TZ} today="2026-10-27" now={new Date("2026-10-27T19:00:00Z")} />
         <details className="h-fit rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) p-4">
