@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MAX_LEVEL, levelFromXp, xpForMinutes } from "./xp";
+import { MAX_LEVEL, levelFromXp, xpForMinutes, levelUpTo } from "./xp";
 
 describe("xpForMinutes", () => {
   it("gives 1 XP per full minute", () => {
@@ -49,5 +49,14 @@ describe("levelFromXp", () => {
       progress: 1,
     });
     expect(levelFromXp(10_000_000).level).toBe(MAX_LEVEL);
+  });
+});
+
+describe("levelUpTo", () => {
+  it("returns the new level only when a level boundary is crossed", () => {
+    expect(levelUpTo(90, 110)).toBe(2); // level 2 starts at 100 XP
+    expect(levelUpTo(100, 150)).toBeNull(); // already level 2
+    expect(levelUpTo(250, 320)).toBe(3); // level 3 starts at 100 + 200 = 300 XP
+    expect(levelUpTo(0, 0)).toBeNull();
   });
 });

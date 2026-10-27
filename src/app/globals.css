@@ -37,3 +37,10 @@
     text-shadow: none !important;
   }
 }
+
+/* The level-up pop-up grows in with a little bounce (only if motion is allowed). */
+@keyframes levelup-pop {
+  0% { transform: scale(0.7); opacity: 0; }
+  70% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); }
+}

@@ -55,3 +55,10 @@ export function levelFromXp(totalXp: number): LevelInfo {
     progress: remaining / xpForNextLevel,
   };
 }
+
+/** The new level if going from `xpBefore` to `xpAfter` crossed into one, otherwise null. */
+export function levelUpTo(xpBefore: number, xpAfter: number): number | null {
+  const before = levelFromXp(xpBefore).level;
+  const after = levelFromXp(xpAfter).level;
+  return after > before ? after : null;
+}

@@ -5,12 +5,14 @@
 // and the no-overlap constraint. The browser never sends a user ID.
 import { refresh } from "next/cache";
 import { defaultAvatar } from "@/components/ds/TrainerAvatar";
-import { effectiveTimeZone, getOverlapping, getProfile, requireUser, type WorkSession } from "@/lib/data";
+import { effectiveTimeZone, getOverlapping, getProfile, getTotalXp, requireUser, type WorkSession } from "@/lib/data";
 import { isValidDateKey } from "@/lib/dates";
 import { formatClock, formatDay, formatDuration } from "@/lib/format";
 import { atWallClock, isValidTime, toDateKey } from "@/lib/time";
+import { levelUpTo } from "@/lib/xp";
 
-export type ActionResult = { ok: true; message: string } | { ok: false; message: string } | null;
+// levelUp: the new trainer level, when clocking out crossed into one (for the celebration pop-up).
+export type ActionResult = { ok: true; message: string; levelUp?: number } | { ok: false; message: string } | null;
 
 const NOTE_MAX = 500;
 
@@ -54,6 +56,9 @@ export async function clockOut(sessionId: string, noteValue: string): Promise<Ac
   const { supabase } = await requireUser();
   const note = cleanNote(noteValue);
   if (note instanceof Error) return { ok: false, message: note.message };
+  // XP before and after, to spot a level-up. The database works out the session's XP
+  // (xp_minutes), so this can't be faked from the browser.
+  const xpBefore = await getTotalXp(supabase);
   // The trigger sets clock_out to the database's now(); the time we send is ignored.
   const { data, error } = await supabase
     .from("work_sessions")
@@ -63,8 +68,9 @@ export async function clockOut(sessionId: string, noteValue: string): Promise<Ac
     .select("id");
   if (error) return { ok: false, message: "Couldn't clock out. Please try again." };
   if (data.length === 0) return { ok: false, message: "That session has already ended." };
+  const levelUp = levelUpTo(xpBefore, await getTotalXp(supabase));
   refresh();
-  return { ok: true, message: "Clocked out." };
+  return { ok: true, message: "Clocked out.", levelUp: levelUp ?? undefined };
 }
 
 /** "your live session on Tue, Oct 27, 9:02 AM – 11:30 AM" */
