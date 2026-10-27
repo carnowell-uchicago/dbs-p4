@@ -79,26 +79,53 @@ function utcOffsetMs(instant: Date, timeZone: string): number {
   return wallClockAsUtc - instantToTheSecond;
 }
 
+/** True for a 24-hour wall-clock time "HH:MM", e.g. "09:05" or "23:59". */
+export function isValidTime(value: string): boolean {
+  return /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
+}
+
+/** True if `timeZone` is an IANA zone the browser/server knows, e.g. "America/Chicago". */
+export function isValidTimeZone(timeZone: string): boolean {
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /**
- * The instant when the calendar day `dateKey` begins (00:00) in `timeZone`.
+ * The instant shown as `dateKey` at `time` ("HH:MM") on a wall clock in `timeZone`.
+ * Example: "2026-10-27" "09:00" in America/Chicago -> 2026-10-27T14:00:00Z.
  *
  * We first pretend the zone is UTC, then correct by the zone's offset.
  * The offset can differ before and after a DST change, so we check it a
  * second time at our answer and correct again if needed.
  *
+ * A time skipped by DST (2:30 AM on the spring-forward day) has no exact
+ * answer; you get a moment about an hour off, which is fine for a timesheet.
+ */
+export function atWallClock(dateKey: string, time: string, timeZone: string): Date {
+  if (!isValidTime(time)) throw new Error(`Invalid time "${time}", expected HH:MM`);
+  const { year, month, day } = parseDateKey(dateKey);
+  const [hour, minute] = time.split(":").map(Number);
+  const wallAsUtc = Date.UTC(year, month - 1, day, hour, minute);
+  const firstOffset = utcOffsetMs(new Date(wallAsUtc), timeZone);
+  let guess = wallAsUtc - firstOffset;
+  const secondOffset = utcOffsetMs(new Date(guess), timeZone);
+  if (secondOffset !== firstOffset) {
+    guess = wallAsUtc - secondOffset;
+  }
+  return new Date(guess);
+}
+
+/**
+ * The instant when the calendar day `dateKey` begins (00:00) in `timeZone`.
  * Assumes midnight exists in the zone. That's true for America/Chicago and
  * other US zones, which change clocks at 2 AM.
  */
 export function startOfDay(dateKey: string, timeZone: string): Date {
-  const { year, month, day } = parseDateKey(dateKey);
-  const midnightIfUtc = Date.UTC(year, month - 1, day);
-  const firstOffset = utcOffsetMs(new Date(midnightIfUtc), timeZone);
-  let guess = midnightIfUtc - firstOffset;
-  const secondOffset = utcOffsetMs(new Date(guess), timeZone);
-  if (secondOffset !== firstOffset) {
-    guess = midnightIfUtc - secondOffset;
-  }
-  return new Date(guess);
+  return atWallClock(dateKey, "00:00", timeZone);
 }
 
 /** The end of a session: its clock-out, or `now` if it is still running. */

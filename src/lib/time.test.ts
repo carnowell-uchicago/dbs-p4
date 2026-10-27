@@ -5,6 +5,9 @@ import {
   sessionMinutes,
   splitSessionByDay,
   startOfDay,
+  atWallClock,
+  isValidTime,
+  isValidTimeZone,
   toDateKey,
   totalsByDay,
 } from "./time";
@@ -103,5 +106,29 @@ describe("splitSessionByDay / totalsByDay", () => {
       { clockIn: new Date("2026-10-27T16:00:00Z"), clockOut: new Date("2026-10-27T18:00:00Z") },
     ];
     expect(totalsByDay(sessions, CHICAGO, new Date()).get("2026-10-27")).toBe(3 * HOUR);
+  });
+});
+
+describe("atWallClock / isValidTime / isValidTimeZone", () => {
+  it("turns a Chicago wall-clock time into the right instant, across DST", () => {
+    expect(atWallClock("2026-10-27", "09:00", CHICAGO).toISOString()).toBe("2026-10-27T14:00:00.000Z"); // CDT
+    expect(atWallClock("2026-11-02", "09:00", CHICAGO).toISOString()).toBe("2026-11-02T15:00:00.000Z"); // CST
+    expect(atWallClock("2026-10-27", "23:59", "UTC").toISOString()).toBe("2026-10-27T23:59:00.000Z");
+  });
+  it("round-trips with toDateKey and formatTime", () => {
+    const t = atWallClock("2026-11-01", "13:45", "Asia/Tokyo");
+    expect(toDateKey(t, "Asia/Tokyo")).toBe("2026-11-01");
+    expect(formatTime(t, "Asia/Tokyo")).toBe("13:45");
+  });
+  it("rejects bad times", () => {
+    expect(isValidTime("9:00")).toBe(false);
+    expect(isValidTime("24:00")).toBe(false);
+    expect(isValidTime("12:60")).toBe(false);
+    expect(isValidTime("00:00")).toBe(true);
+    expect(() => atWallClock("2026-10-27", "25:00", CHICAGO)).toThrow();
+  });
+  it("knows real time zones from made-up ones", () => {
+    expect(isValidTimeZone("America/Chicago")).toBe(true);
+    expect(isValidTimeZone("Mars/Olympus_Mons")).toBe(false);
   });
 });
