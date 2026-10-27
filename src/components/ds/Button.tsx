@@ -3,7 +3,7 @@ import { forceAttr, type ForcedState } from "@/lib/design-system";
 import { disabledLook, focusRing } from "./classes";
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "secondary" | "ghost";
+  variant?: "primary" | "secondary" | "ghost" | "onLight";
   size?: "md" | "sm";
   force?: ForcedState;
 };
@@ -26,7 +26,11 @@ const secondary =
 const ghost =
   "border-transparent bg-transparent text-(--dk-diamond) hover:bg-(--dk-raised) data-[force=hover]:bg-(--dk-raised) active:translate-y-px active:bg-(--dk-diamond)/15 data-[force=pressed]:translate-y-px data-[force=pressed]:bg-(--dk-diamond)/15";
 
-const variants = { primary, secondary, ghost };
+// For buttons inside light surfaces (text boxes, name plates): dark ink on the white card.
+const onLight =
+  "border-(--dk-void) bg-transparent text-(--dk-void) hover:bg-(--dk-void) hover:text-(--dk-ball) data-[force=hover]:bg-(--dk-void) data-[force=hover]:text-(--dk-ball) active:translate-y-px data-[force=pressed]:translate-y-px";
+
+const variants = { primary, secondary, ghost, onLight };
 
 export function Button({
   variant = "secondary",

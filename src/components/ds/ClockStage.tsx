@@ -77,10 +77,10 @@ export function ClockStage({
     <div className="relative mx-auto flex w-fit items-end gap-2 sm:gap-12">
       <ClockButton running={out} size="md" open={look.lidOpen} {...button} />
 
-      {/* The beam, from the centre of the ball (64px in) to the centre of the spot (48px from the right). */}
+      {/* The beam, from the centre of the ball (64px in, 72px on bigger screens) to the centre of the spot (48px from the right). */}
       <span
         aria-hidden
-        className={`pointer-events-none absolute bottom-[60px] left-16 right-12 h-2 origin-left rounded-full transition-[opacity,scale] duration-200 ${look.beam === "none" ? "scale-x-0 opacity-0" : "scale-x-100 opacity-100"}`}
+        className={`pointer-events-none absolute bottom-[60px] left-16 right-12 sm:bottom-[68px] sm:left-18 h-2 origin-left rounded-full transition-[opacity,scale] duration-200 ${look.beam === "none" ? "scale-x-0 opacity-0" : "scale-x-100 opacity-100"}`}
         style={{ background: beamColour, boxShadow: `0 0 10px ${beamColour}, 0 0 24px ${beamColour}` }}
       />
 

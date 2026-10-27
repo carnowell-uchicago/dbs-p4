@@ -26,7 +26,7 @@ export function ClockButton({
   ...rest
 }: Props) {
   const label = running ? "Clock out" : "Clock in";
-  const dims = { lg: "h-44 w-44", md: "h-32 w-32", sm: "h-24 w-24" }[size];
+  const dims = { lg: "h-44 w-44", md: "h-32 w-32 sm:h-36 sm:w-36", sm: "h-24 w-24" }[size];
   // A big centre button with big text, so the main action reads at a glance.
   const centre = { lg: "w-[58%] text-xl", md: "w-[64%] text-base", sm: "w-[70%] text-[13px] tracking-normal" }[size];
   return (
@@ -38,10 +38,10 @@ export function ClockButton({
       className={`group relative ${dims} shrink-0 select-none rounded-full shadow-[0_0_10px_color-mix(in_srgb,var(--dk-red)_45%,transparent),0_0_26px_color-mix(in_srgb,var(--dk-red)_22%,transparent)] transition-[box-shadow,translate,filter] duration-150 hover:shadow-[0_0_8px_var(--dk-red),0_0_28px_color-mix(in_srgb,var(--dk-red)_55%,transparent)] data-[force=hover]:shadow-[0_0_8px_var(--dk-red),0_0_28px_color-mix(in_srgb,var(--dk-red)_55%,transparent)] active:translate-y-0.5 active:brightness-90 data-[force=pressed]:translate-y-0.5 data-[force=pressed]:brightness-90 focus-visible:outline-4 focus-visible:outline-solid focus-visible:outline-offset-4 focus-visible:outline-(--dk-sky) data-[force=focus]:outline-4 data-[force=focus]:outline-solid data-[force=focus]:outline-offset-4 data-[force=focus]:outline-(--dk-sky) disabled:pointer-events-none disabled:grayscale disabled:opacity-50 ${open ? "disabled:grayscale-0 disabled:opacity-100" : ""} ${className}`}
       {...rest}
     >
-      {/* A slow red "breathing" glow so the ball stands out (still for reduced motion). */}
+      {/* A slow red "breathing" glow that starts right at the ball's edge (still for reduced motion). */}
       <span
         aria-hidden
-        className={`pointer-events-none absolute -inset-1.5 rounded-full shadow-[0_0_18px_6px_color-mix(in_srgb,var(--dk-red)_45%,transparent)] motion-safe:animate-pulse ${open ? "opacity-0" : ""}`}
+        className={`pointer-events-none absolute inset-0 rounded-full shadow-[0_0_20px_4px_color-mix(in_srgb,var(--dk-red)_50%,transparent)] motion-safe:animate-pulse ${open ? "opacity-0" : ""}`}
       />
       {/* Light inside the ball, seen when the lid is up. */}
       <span

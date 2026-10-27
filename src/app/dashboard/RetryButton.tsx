@@ -4,12 +4,13 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { Button } from "@/components/ds/Button";
 
-// Re-renders the page on the server, which asks PokéAPI again.
+// Re-renders the page on the server, which asks PokéAPI again. It sits inside a white
+// text box, so it uses the dark-on-light button style.
 export function RetryButton() {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   return (
-    <Button size="sm" disabled={pending} onClick={() => startTransition(() => router.refresh())}>
+    <Button variant="onLight" size="sm" disabled={pending} onClick={() => startTransition(() => router.refresh())}>
       {pending ? "Trying…" : "Try again"}
     </Button>
   );
