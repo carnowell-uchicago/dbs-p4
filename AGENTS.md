@@ -61,7 +61,7 @@ The student also has to explain everything in class: request tracing, access con
   - `time.ts`, `dates.ts`, `ranges.ts`, `timesheet.ts` (CSV)
   - `xp.ts`, `daily-pokemon.ts`, `coach-lines.ts`
   - `pokeapi.ts`
-- **Step 5 (database half) done 2026-10-27:** 4 migrations applied via MCP and saved in `supabase/migrations/`. RLS on both tables (4 own-rows policies each), anon has no grants, security advisor clean. Verified with simulated users in rolled-back transactions. **Still to do in Step 5:** install `@supabase/supabase-js`, write the Clerk-token Supabase client, confirm the student finished the Clerk ↔ Supabase integration + env vars.
+- **Step 5 done 2026-10-27:** 4 migrations applied via MCP and saved in `supabase/migrations/`. RLS on both tables (4 own-rows policies each), anon has no grants, security advisor clean; verified with simulated users in rolled-back transactions. Clerk ↔ Supabase integration + env vars done by the student and verified end to end (signed in: token role `authenticated`, query OK; signed out: `42501 permission denied`). Clients: `src/lib/supabase/server.ts` (`createServerSupabase()`), `client.ts` (`useSupabase()` hook), types in `database.types.ts` (regenerate via MCP after each migration).
 - **Supabase (in progress, student):** project ref `dxwqwpbtuizagvkawlhl`. `.mcp.json` is committed and scoped to it. The agent fixed a line break that had split the ref.
 
 **Waiting on the student:**
