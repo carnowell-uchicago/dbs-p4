@@ -216,7 +216,7 @@ Policies: select/insert/update/delete only where user_id = (auth.jwt() ->> 'sub'
 | `CLERK_SECRET_KEY` | **no, server only** | server |
 | `NEXT_PUBLIC_SUPABASE_URL` | yes | browser + server |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (`sb_publishable_…`, from Project Settings → API Keys) | yes (publishable) | browser + server |
-| Playwright test-user credentials (e.g. `E2E_USER1_EMAIL`, `E2E_USER1_PASSWORD`, `E2E_USER2_...`) | **no** | tests only |
+| Playwright test users: `E2E_USER1_EMAIL`, `E2E_USER2_EMAIL` (passwords not needed: the test signs in with a Clerk sign-in ticket made with `CLERK_SECRET_KEY`, because password sign-in from a new browser stops at Clerk's `needs_client_trust` email code) | **no** | tests only |
 | External API key (only if the chosen API needs one) | **no, server only** | server |
 
 Never use the Supabase **secret / service_role** key in the app. It bypasses RLS.
@@ -353,6 +353,7 @@ To help with #5, keep a short running log below. Record each time the student re
 - 2026-10-27: The student picked front page **B**, asked for signed-in users to skip the front page (proxy redirect to `/dashboard`), and rejected the dashboard design (unbalanced, too many boxes, not game-like). They chose a battle scene, then **corrected the agent's layout mid-build**: the agent had the coach as the opponent; the student said the coach belongs on *your* side, behind you where the trainer stands, and the **Clock is the opponent**. The agent rebuilt it that way (coach back sprite, Clock HP drains over an 8 h day).
 - 2026-10-27: The student asked for a timesheet button (the agent built `/log` with print + CSV), more neon glow, a player HP bar fixed at 100/100, roomier coach label (the agent found `sm:not-sr-only` was zeroing its padding), and flagged the clock's 4 looking like a 9 (font comparison, student picked Press Start 2P). The agent also found the dev server serving stale CSS and restarted it.
 - 2026-10-27: Testing the API-down state, the student caught an **invisible Try again button** (white on the white text box). On the Pokédex they caught that **"Coached me" didn't filter** until Search was pressed; it now applies on click. The student also asked the agent to re-read the PDF to confirm the two-user Playwright test is required (it is: Step 7 and Requirements).
+- 2026-10-27: Playwright test written (`e2e/rls.spec.ts`, `npm run test:e2e`). First runs failed on setup, not RLS: a wrong test-user password (student fixed it), then Clerk's `needs_client_trust` new-device check (agent diagnosed it from the sign-in status and switched to ticket sign-in by email). Then it passed with RLS intact.
 - 2026-10-27: Agent slip: moving `fonts.ts` left the new copy staged, so it landed in an unrelated commit ("Rework the idea…"). The next commit removed the old copy; history was left as is.
 
 ---

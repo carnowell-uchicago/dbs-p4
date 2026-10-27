@@ -41,3 +41,9 @@ Assignment 4.pdf
 
 # Claude Code agent worktrees (separate checkouts; never commit)
 .claude/worktrees/
+
+# Playwright output
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
