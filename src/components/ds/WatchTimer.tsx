@@ -24,9 +24,9 @@ export function WatchTimer({ elapsed, caption, running }: Props) {
         <p className="text-xs font-bold uppercase tracking-[0.08em]" style={{ fontFamily: "var(--dp-mono)" }}>
           {running ? "● On the clock" : "Off the clock"}
         </p>
-        <p className="text-5xl font-bold tabular-nums leading-none sm:text-6xl" style={{ fontFamily: "var(--dp-pixel)" }}>
+        <p className="my-1 text-4xl tabular-nums leading-none sm:text-5xl" style={{ fontFamily: "var(--dp-clock)" }}>
           {hm}
-          <span className="text-3xl sm:text-4xl">{seconds}</span>
+          <span className="text-xl sm:text-2xl">{seconds}</span>
         </p>
         <p className="mt-1 text-sm" style={{ fontFamily: "var(--dp-mono)" }}>
           {caption}
