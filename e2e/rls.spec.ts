@@ -38,13 +38,15 @@ async function signedInPage(browser: Browser, n: 1 | 2): Promise<Page> {
 }
 
 async function addManualSession(page: Page, day: string, note: string) {
-  await page.getByText("+ Add time manually").click();
-  await page.getByLabel("Date", { exact: true }).fill(day);
-  await page.getByLabel("Start", { exact: true }).fill("10:00");
-  await page.getByLabel("End", { exact: true }).fill("10:01");
-  await page.getByLabel("Note (optional)").fill(note);
-  await page.getByRole("button", { name: "Add time" }).click();
-  await expect(page.getByText(/Added 1 min on/)).toBeVisible({ timeout: 15_000 });
+  // Only look inside the "Add time manually" form: the Edit pop-ups have fields with the same labels.
+  const form = page.locator("details", { hasText: "+ Add time manually" });
+  await form.getByText("+ Add time manually").click();
+  await form.getByLabel("Date", { exact: true }).fill(day);
+  await form.getByLabel("Start", { exact: true }).fill("10:00");
+  await form.getByLabel("End", { exact: true }).fill("10:01");
+  await form.getByLabel("Note (optional)").fill(note);
+  await form.getByRole("button", { name: "Add time" }).click();
+  await expect(form.getByText(/Added 1 min on/)).toBeVisible({ timeout: 15_000 });
 }
 
 async function openTimesheetFor(page: Page, day: string) {
@@ -68,11 +70,11 @@ test("two users can't see each other's sessions", async ({ browser }) => {
 
   // B sees their own note, and NOT A's.
   await openTimesheetFor(b, day);
-  await expect(b.getByText(noteB)).toBeVisible();
+  await expect(b.getByText(noteB).first()).toBeVisible(); // shown in the table and the session list
   await expect(b.getByText(noteA)).toHaveCount(0);
 
   // A (still signed in, separate browser) sees their own, and NOT B's.
   await openTimesheetFor(a, day);
-  await expect(a.getByText(noteA)).toBeVisible();
+  await expect(a.getByText(noteA).first()).toBeVisible(); // shown in the table and the session list
   await expect(a.getByText(noteB)).toHaveCount(0);
 });
