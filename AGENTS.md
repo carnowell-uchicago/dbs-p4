@@ -169,11 +169,15 @@ work_sessions
   user_id       text not null default (auth.jwt() ->> 'sub')
   clock_in      timestamptz not null
   clock_out     timestamptz            -- null while running; check clock_out > clock_in
-  note          text
+  source        text not null default 'clock'   -- 'clock' (live Poké Ball) | 'manual' (added afterwards)
+  note          text                   -- optional "what I worked on"; check length <= 500
   created_at    timestamptz not null default now()
+  + check: source = 'manual' requires clock_out (a manual entry is always finished)
   + unique partial index: one running session per user (where clock_out is null)
 RLS: enabled on both; select/insert/update/delete only where user_id = (auth.jwt() ->> 'sub')
 ```
+
+Student requests (2026-10-27): an optional **note** per session (some people have to log what they spent time on), and **manual / retroactive entries**. Manual entries count toward hours and the timesheet CSV, but **earn no trainer XP**, to encourage logging live every day. XP is summed only over `source = 'clock'` sessions.
 
 Not stored, calculated: XP and trainer level (from sessions, `src/lib/xp.ts`), the daily coach (from the date, `src/lib/daily-pokemon.ts`), and which coach trained you on each logged day.
 
@@ -328,6 +332,7 @@ To help with #5, keep a short running log below. Record each time the student re
 - 2026-10-27: The student chose the **dusk** direction and a **red Poké Ball** Clock in button. They then rejected the pixel font the agent had picked (Pixelify Sans) as hard to read. The agent built a 10-font comparison, found that Pixelify and Tiny5 make 5 and S look alike ("7.5" reads as "7.S"), and the student picked **Silkscreen**.
 - 2026-10-27: The student asked for a **tall-grass background** instead of plain dark. The agent's first tile had a bug (all four quadrants were identical, so there was no offset), which the agent caught and fixed. It also checked text contrast against the brightest blade.
 - 2026-10-27: The student set up the Supabase MCP. The agent caught a **line break splitting the project ref** in `.mcp.json`, which would have stopped it connecting, and fixed it.
+- 2026-10-27: The student logged in to the Supabase MCP (the agent confirmed it reaches project `dxwqwpbtuizagvkawlhl`, empty `public` schema). Reviewing the data model, the student **added two features**: optional session notes, and manual/retroactive time entries that deliberately **earn no XP**, to encourage logging live.
 - 2026-10-27: Agent slip: moving `fonts.ts` left the new copy staged, so it landed in an unrelated commit ("Rework the idea…"). The next commit removed the old copy; history was left as is.
 
 ---
