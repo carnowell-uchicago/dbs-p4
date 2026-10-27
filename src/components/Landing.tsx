@@ -83,22 +83,27 @@ export function ProductSplit() {
     <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
       <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
         <div className="space-y-6">
-          <Eyebrow>For remote workers and students</Eyebrow>
+          <Eyebrow>Work-hours tracker for remote workers and students</Eyebrow>
           <h1 className="neon-text text-4xl font-bold uppercase leading-[1.05] tracking-[0.05em] sm:text-5xl" style={display}>
-            Your hours,
+            Log your
             <br />
-            logged in one press.
+            work hours.
           </h1>
-          <p className="max-w-lg text-lg text-(--dk-muted)">
-            A timesheet you&apos;ll actually keep. Clock in with a Poké Ball, get coached by a new Pokémon every day, and level up
-            your trainer as the hours add up.
+          <p className="max-w-lg text-lg">
+            Clock in when you start working and clock out when you stop. Trainer Timesheet keeps a record of your hours, adds up
+            each day and week, and turns them into a timesheet you can send to your boss, client or teacher.
+          </p>
+          <p className="max-w-lg text-(--dk-muted)">
+            The twist: it&apos;s a Pokémon game. Your clock-in button is a Poké Ball, a new Pokémon coaches you each day, and every
+            hour you log levels up your trainer.
           </p>
           <ul className="space-y-2 text-sm" style={mono}>
-            <li>✓ Live timer, notes on every session</li>
-            <li>✓ Forgot to clock in? Add time later</li>
-            <li>✓ CSV timesheet for any week or range</li>
+            <li>✓ One-press clock in and clock out, with a live timer</li>
+            <li>✓ Daily and weekly totals, plus notes on what you worked on</li>
+            <li>✓ Forgot to clock in? Add the hours afterwards</li>
+            <li>✓ Download or print a timesheet for any week or date range</li>
           </ul>
-          <StartCta />
+          <StartCta label="Start logging hours" />
         </div>
 
         {/* The product as the picture, built from the real components. */}
@@ -115,7 +120,7 @@ export function ProductSplit() {
 
       <section aria-labelledby="day-h" className="mt-16">
         <h2 id="day-h" className="text-sm font-bold uppercase tracking-[0.1em]" style={display}>
-          A day with your coach
+          A workday, logged
         </h2>
         <ol className="mt-4 grid gap-4 md:grid-cols-3">
           {day.map((d) => (

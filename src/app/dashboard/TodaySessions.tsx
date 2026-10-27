@@ -2,11 +2,30 @@
 import Link from "next/link";
 import { Badge } from "@/components/ds/Tag";
 import type { Tables } from "@/lib/supabase/database.types";
+import { formatClock, formatDay, formatDuration } from "@/lib/format";
+import { formatTime, splitSessionByDay, toDateKey } from "@/lib/time";
+import type { EditableSession } from "./EditSessionButton";
+import { SessionActions } from "./SessionActions";
 
 type WorkSession = Tables<"work_sessions">;
-import { formatClock, formatDay, formatDuration } from "@/lib/format";
-import { splitSessionByDay } from "@/lib/time";
-import { DeleteSessionButton } from "./DeleteSessionButton";
+
+/** A moment as a datetime-local value in `timeZone`: "2026-10-27T09:05". */
+function localInput(instant: Date, timeZone: string): string {
+  return `${toDateKey(instant, timeZone)}T${formatTime(instant, timeZone)}`;
+}
+
+/** What the Edit pop-up needs for one session. */
+export function editableSession(s: WorkSession, timeZone: string, now: Date, label: string): EditableSession {
+  return {
+    id: s.id,
+    label,
+    start: localInput(new Date(s.clock_in), timeZone),
+    end: s.clock_out ? localInput(new Date(s.clock_out), timeZone) : null,
+    note: s.note,
+    source: s.source,
+    max: localInput(now, timeZone),
+  };
+}
 
 /** Milliseconds of `session` that fall on `dateKey` in `timeZone`. */
 export function msOnDay(session: WorkSession, dateKey: string, timeZone: string, now: Date): number {
@@ -51,7 +70,7 @@ export function TodaySessions({ sessions, timeZone, today, now }: { sessions: Wo
                   {s.source === "manual" && <Badge kind="new">Manual · no XP</Badge>}
                   {s.note && <span className="basis-full text-(--dk-muted)">{s.note}</span>}
                 </div>
-                <DeleteSessionButton sessionId={s.id} label={`${range} (${length})`} xp={s.xp_minutes ?? 0} running={s.clock_out === null} />
+                <SessionActions session={editableSession(s, timeZone, now, `${range} (${length})`)} xp={s.xp_minutes ?? 0} />
               </li>
             );
           })}
