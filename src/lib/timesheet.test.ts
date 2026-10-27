@@ -161,3 +161,17 @@ describe("toCsv with notes", () => {
     );
   });
 });
+
+describe("csvField formula injection", () => {
+  it("neutralises text a spreadsheet would run as a formula", () => {
+    expect(csvField("=HYPERLINK(\"http://evil\")")).toBe(`"'=HYPERLINK(""http://evil"")"`);
+    expect(csvField("+1")).toBe("'+1");
+    expect(csvField("-cmd")).toBe("'-cmd");
+    expect(csvField("@SUM(A1)")).toBe("'@SUM(A1)");
+  });
+  it("leaves normal text and numbers alone", () => {
+    expect(csvField("Q3 report")).toBe("Q3 report");
+    expect(csvField(-1)).toBe("-1");
+    expect(csvField("2026-10-27")).toBe("2026-10-27");
+  });
+});

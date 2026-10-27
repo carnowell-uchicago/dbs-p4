@@ -113,10 +113,13 @@ function formatClockOut(end: Date, date: string, timeZone: string): string {
 /**
  * Quotes one CSV field following RFC 4180: if it contains a comma, a double
  * quote, or a line break, wrap it in double quotes and double any quotes
- * inside it. Otherwise leave it as it is.
+ * inside it. Otherwise leave it as it is. Text that a spreadsheet would run
+ * as a formula gets a leading ' first.
  */
 export function csvField(value: string | number): string {
-  const text = String(value);
+  // Spreadsheets run text starting with = + - @ (or a tab / carriage return) as a formula.
+  // A leading ' makes them show it as plain text instead (from /security-review).
+  const text = typeof value === "string" && /^[=+\-@\t\r]/.test(value) ? `'${value}` : String(value);
   if (/[",\r\n]/.test(text)) {
     return `"${text.replace(/"/g, '""')}"`;
   }
