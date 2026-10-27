@@ -631,9 +631,11 @@ const tiles: Tile[] = [
 const order: (Tile | (typeof references)[number])[] = [
   references[0],
   tiles[0],
+  references[7],
   tiles[2],
   tiles[1],
   references[2],
+  references[6],
   tiles[3],
   tiles[4],
   tiles[6],
@@ -641,6 +643,7 @@ const order: (Tile | (typeof references)[number])[] = [
   references[1],
   tiles[8],
   tiles[7],
+  references[4],
   tiles[16],
   references[3],
   tiles[9],
@@ -649,6 +652,7 @@ const order: (Tile | (typeof references)[number])[] = [
   tiles[12],
   tiles[15],
   tiles[14],
+  references[5],
   tiles[17],
   tiles[18],
   tiles[19],
@@ -679,7 +683,8 @@ export default function MoodBoard() {
             game&apos;s daytime palette: bright sky, white boxes, hard outlines, a green watch.
           </p>
           <p className="max-w-2xl text-sm text-(--dp-muted)">
-            Three directions to react to: <b className="text-(--dp-ink)">A</b> light daytime,{" "}
+            Eight references (four of them gameplay) sit beside the ideas they led to. Three
+            directions to react to: <b className="text-(--dp-ink)">A</b> light daytime,{" "}
             <b className="text-(--dp-ink)">B</b> dark dusk, <b className="text-(--dp-ink)">C</b> the
             watch&apos;s greens as an accent.
           </p>
