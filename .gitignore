@@ -27,6 +27,23 @@ blob-report/
 # course handout (instructor's material; kept locally, not published)
 Assignment 4.pdf
 
+# testing / build
+/coverage
+/build
+*.tsbuildinfo
+.pnp
+.pnp.*
+
 # misc
 .DS_Store
 *.log
+*.pem
+
+# Claude Code agent worktrees (separate checkouts; never commit)
+.claude/worktrees/
+
+# Playwright output
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

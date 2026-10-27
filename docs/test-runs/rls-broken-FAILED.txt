@@ -1,0 +1,49 @@
+# Playwright RLS test: run with RLS BROKEN on purpose (2026-10-27 13:21 CDT)
+# Policy at the time: "Users can read their own sessions" on work_sessions USING (true)
+# What user B's page said when trying to save (from the failure snapshot):
+      - paragraph: Can't add that
+      - text: That overlaps your manual entry on Fri, Feb 27, 10:00 AM – 10:01 AM. Pick a time outside it.
+# (That 10:00 session belonged to user A: B's overlap check could read A's row.)
+
+
+Running 1 test using 1 worker
+
+  ✘  1 [chromium] › e2e/rls.spec.ts:55:5 › two users can't see each other's sessions (26.0s)
+
+
+  1) [chromium] › e2e/rls.spec.ts:55:5 › two users can't see each other's sessions ─────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText(/Added 1 min on/)
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByText(/Added 1 min on/) with timeout 15000ms
+      - waiting for getByText(/Added 1 min on/)
+
+
+      45 |   await page.getByLabel("Note (optional)").fill(note);
+      46 |   await page.getByRole("button", { name: "Add time" }).click();
+    > 47 |   await expect(page.getByText(/Added 1 min on/)).toBeVisible({ timeout: 15_000 });
+         |                                                  ^
+      48 | }
+      49 |
+      50 | async function openTimesheetFor(page: Page, day: string) {
+        at addManualSession (/Users/jacob/projects/p4/e2e/rls.spec.ts:47:50)
+        at /Users/jacob/projects/p4/e2e/rls.spec.ts:67:3
+
+    Error Context: test-results/rls-two-users-can-t-see-each-other-s-sessions-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/rls-two-users-can-t-see-each-other-s-sessions-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/rls-two-users-can-t-see-each-other-s-sessions-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › e2e/rls.spec.ts:55:5 › two users can't see each other's sessions ──────────────────

@@ -1,0 +1,9 @@
+# Playwright RLS test: run after restoring the policy (2026-10-27 13:23 CDT)
+# Policy: "Users can read their own sessions" USING ((select auth.jwt()) ->> 'sub' = user_id). RLS on for both tables; security advisor: no issues.
+
+
+Running 1 test using 1 worker
+
+  ✓  1 [chromium] › e2e/rls.spec.ts:55:5 › two users can't see each other's sessions (9.0s)
+
+  1 passed (10.3s)

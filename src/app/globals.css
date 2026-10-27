@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+/* Colours, fonts and the tall-grass background come from src/components/ds/
+   (applied on <body> in layout.tsx). Nothing unlayered here: unlayered rules
+   would beat Tailwind's utility classes. */
+
+/* Neon (Dusk): one place to tune the glow. Sky is the only glow colour, except the
+   Poké Ball (red) and the bars (their own fill colour). Glow never carries meaning alone. */
+@utility neon-panel {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--dk-sky) 35%, transparent),
+    0 0 18px color-mix(in srgb, var(--dk-sky) 42%, transparent),
+    0 0 40px color-mix(in srgb, var(--dk-sky) 14%, transparent),
+    inset 0 0 22px color-mix(in srgb, var(--dk-sky) 14%, transparent);
+}
+@utility neon-text {
+  text-shadow:
+    0 0 4px color-mix(in srgb, var(--dk-sky) 80%, transparent),
+    0 0 18px color-mix(in srgb, var(--dk-sky) 55%, transparent);
+}
+@utility neon-frame {
+  box-shadow:
+    0 0 0 2px var(--dk-edge),
+    0 0 12px color-mix(in srgb, var(--dk-sky) 45%, transparent),
+    0 0 28px color-mix(in srgb, var(--dk-sky) 18%, transparent);
+}
+
+/* Printing a timesheet: plain black on white, no grass, no glow. (The page background is an
+   inline style on <body>, so !important is needed to override it, only when printing.) */
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+}
