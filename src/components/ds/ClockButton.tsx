@@ -27,15 +27,16 @@ export function ClockButton({
 }: Props) {
   const label = running ? "Clock out" : "Clock in";
   const dims = { lg: "h-44 w-44", md: "h-32 w-32 sm:h-36 sm:w-36", sm: "h-24 w-24" }[size];
-  // A big centre button with big text, so the main action reads at a glance.
-  const centre = { lg: "w-[58%] text-xl", md: "w-[64%] text-base", sm: "w-[70%] text-[13px] tracking-normal" }[size];
+  // The centre button carries the label. It is the part that "clicks": the ball itself
+  // stays still until it opens or closes.
+  const centre = { lg: "w-[52%] text-lg", md: "w-[57%] text-[15px]", sm: "w-[64%] text-[12px] tracking-normal" }[size];
   return (
     <button
       type={type}
       aria-label={label}
       disabled={disabled || force === "disabled"}
       {...forceAttr(force)}
-      className={`group relative ${dims} shrink-0 select-none rounded-full shadow-[0_0_10px_color-mix(in_srgb,var(--dk-red)_45%,transparent),0_0_26px_color-mix(in_srgb,var(--dk-red)_22%,transparent)] transition-[box-shadow,translate,filter] duration-150 hover:shadow-[0_0_8px_var(--dk-red),0_0_28px_color-mix(in_srgb,var(--dk-red)_55%,transparent)] data-[force=hover]:shadow-[0_0_8px_var(--dk-red),0_0_28px_color-mix(in_srgb,var(--dk-red)_55%,transparent)] active:translate-y-0.5 active:brightness-90 data-[force=pressed]:translate-y-0.5 data-[force=pressed]:brightness-90 focus-visible:outline-4 focus-visible:outline-solid focus-visible:outline-offset-4 focus-visible:outline-(--dk-sky) data-[force=focus]:outline-4 data-[force=focus]:outline-solid data-[force=focus]:outline-offset-4 data-[force=focus]:outline-(--dk-sky) disabled:pointer-events-none disabled:grayscale disabled:opacity-50 ${open ? "disabled:grayscale-0 disabled:opacity-100" : ""} ${className}`}
+      className={`group relative ${dims} shrink-0 select-none rounded-full shadow-[0_0_10px_color-mix(in_srgb,var(--dk-red)_45%,transparent),0_0_26px_color-mix(in_srgb,var(--dk-red)_22%,transparent)] focus-visible:outline-4 focus-visible:outline-solid focus-visible:outline-offset-4 focus-visible:outline-(--dk-sky) data-[force=focus]:outline-4 data-[force=focus]:outline-solid data-[force=focus]:outline-offset-4 data-[force=focus]:outline-(--dk-sky) disabled:pointer-events-none disabled:grayscale disabled:opacity-50 ${open ? "disabled:grayscale-0 disabled:opacity-100" : ""} ${className}`}
       {...rest}
     >
       {/* A slow red "breathing" glow that starts right at the ball's edge (still for reduced motion). */}
@@ -55,13 +56,13 @@ export function ClockButton({
         aria-hidden
         className={`absolute inset-x-0 top-0 h-1/2 origin-bottom-left transition-transform duration-300 ease-out ${open ? "-rotate-[50deg]" : "rotate-0"}`}
       >
-        <span className={`absolute inset-0 rounded-t-full border-4 border-b-4 ${ink} bg-(--dk-red) group-hover:bg-(--dk-red-hot) group-data-[force=hover]:bg-(--dk-red-hot)`} />
+        <span className={`absolute inset-0 rounded-t-full border-4 border-b-4 ${ink} bg-(--dk-red)`} />
         {/* Shine. */}
         <span className="absolute left-[18%] top-[24%] h-[28%] w-[24%] rotate-[-30deg] rounded-full bg-white/35" />
       </span>
       {/* Centre button with the label; it hides while the ball is open. */}
       <span
-        className={`absolute left-1/2 top-1/2 flex aspect-square -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full border-4 ${ink} bg-(--dk-ball) font-extrabold uppercase leading-[1.05] tracking-[0.03em] ${centre} text-(--dk-void) transition-[opacity,scale] duration-200 ${open ? "scale-75 opacity-0" : "opacity-100"}`}
+        className={`absolute left-1/2 top-1/2 flex aspect-square -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full border-4 ${ink} bg-(--dk-ball) font-extrabold uppercase leading-[1.05] tracking-[0.03em] ${centre} text-(--dk-void) shadow-[inset_0_-4px_0_rgb(0_0_0/0.16)] transition-[opacity,scale,box-shadow,background-color] duration-100 group-hover:bg-white group-hover:shadow-[inset_0_-4px_0_rgb(0_0_0/0.16),0_0_10px_var(--dk-red-hot)] group-data-[force=hover]:bg-white group-active:scale-[0.92] group-active:shadow-[inset_0_4px_0_rgb(0_0_0/0.22)] group-data-[force=pressed]:scale-[0.92] group-data-[force=pressed]:shadow-[inset_0_4px_0_rgb(0_0_0/0.22)] ${open ? "scale-75 opacity-0" : "opacity-100"}`}
         style={{ fontFamily: "var(--dp-display)" }}
       >
         {/* Capitals have no descenders, so the line box leaves empty space under them and
