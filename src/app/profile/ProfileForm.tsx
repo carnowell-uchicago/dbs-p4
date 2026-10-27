@@ -23,7 +23,7 @@ export function ProfileForm({
   name: string;
   avatar: Avatar;
   timezone: string | null;
-  zones: string[];
+  zones: { value: string; label: string }[]; // "GMT−05:00 · Central Time: Chicago, …"
 }) {
   const [name, setName] = useState(savedName);
   const [avatar, setAvatar] = useState(savedAvatar);
@@ -88,13 +88,13 @@ export function ProfileForm({
             name="timezone"
             value={zone}
             onChange={(e) => setZone(e.target.value)}
-            className={`h-10 max-w-sm rounded-(--dk-r-md) border-2 border-(--dk-edge) bg-(--dk-panel) px-3 text-sm text-(--dk-ice) [color-scheme:dark] hover:border-(--dk-diamond) ${focusRing}`}
+            className={`h-10 w-full max-w-md rounded-(--dk-r-md) border-2 border-(--dk-edge) bg-(--dk-panel) px-3 text-sm text-(--dk-ice) [color-scheme:dark] hover:border-(--dk-diamond) ${focusRing}`}
             style={{ fontFamily: "var(--dp-mono)" }}
           >
             <option value="">Automatic (this device: {browserZone || "detecting…"})</option>
             {zones.map((z) => (
-              <option key={z} value={z}>
-                {z.replaceAll("_", " ")}
+              <option key={z.value} value={z.value}>
+                {z.label}
               </option>
             ))}
           </select>
