@@ -27,7 +27,7 @@ export function tagText(bg: string): string {
 }
 
 const tagBase =
-  "inline-flex h-6 items-center rounded-(--dk-r-sm) border-2 border-black/30 px-2 text-[12px] font-bold uppercase tracking-[0.06em]";
+  "inline-flex h-6 items-center whitespace-nowrap rounded-(--dk-r-sm) border-2 border-black/30 px-2 text-[12px] font-bold uppercase tracking-[0.06em]";
 
 export function TypeTag({ type }: { type: string }) {
   const bg = typeColors[type] ?? typeColors.normal;
