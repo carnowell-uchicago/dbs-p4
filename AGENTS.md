@@ -162,24 +162,34 @@ profiles
   user_id       text primary key default (auth.jwt() ->> 'sub')   -- Clerk user ID
   trainer_name  text not null
   avatar        jsonb not null   -- { skin, hair, hairColor, hat, hatColor, outfit } (see TrainerAvatar.tsx)
-  timezone      text not null default 'America/Chicago'   -- IANA zone, used to group hours by day
+  timezone      text             -- NULL = auto-detect from the browser; set = saved override (IANA zone)
   created_at    timestamptz not null default now()
 work_sessions
   id            uuid primary key default gen_random_uuid()
   user_id       text not null default (auth.jwt() ->> 'sub')
-  clock_in      timestamptz not null
-  clock_out     timestamptz            -- null while running; check clock_out > clock_in
-  source        text not null default 'clock'   -- 'clock' (live Poké Ball) | 'manual' (added afterwards)
+  source        text not null default 'clock'   -- 'clock' (live Poké Ball) | 'manual' (added afterwards); can't change after insert
+  clock_in      timestamptz not null   -- editable: what the timesheet shows
+  clock_out     timestamptz            -- editable; null while running; check clock_out > clock_in
+  recorded_in   timestamptz            -- set ONLY by trigger = DB now() at clock in; never editable; null for manual
+  recorded_out  timestamptz            -- set ONLY by trigger = DB now() at clock out; never editable; null for manual
+  xp_minutes    integer GENERATED      -- minutes of overlap between [clock_in, clock_out] and [recorded_in, recorded_out]; 0 for manual
   note          text                   -- optional "what I worked on"; check length <= 500
   created_at    timestamptz not null default now()
   + check: source = 'manual' requires clock_out (a manual entry is always finished)
   + unique partial index: one running session per user (where clock_out is null)
+  + trigger (before insert/update): clock sessions get clock_in = recorded_in = now() on insert and
+    clock_out = recorded_out = now() when stopped; source and recorded_* can never be changed by the client
 RLS: enabled on both; select/insert/update/delete only where user_id = (auth.jwt() ->> 'sub')
 ```
 
-Student requests (2026-10-27): an optional **note** per session (some people have to log what they spent time on), and **manual / retroactive entries**. Manual entries count toward hours and the timesheet CSV, but **earn no trainer XP**, to encourage logging live every day. XP is summed only over `source = 'clock'` sessions.
+Student requests (2026-10-27):
+- An optional **note** per session (some people have to log what they spent time on).
+- **Manual / retroactive entries** count toward hours and the timesheet CSV, but **earn no trainer XP**, to encourage logging live every day.
+- **Timezone:** auto-detect from the browser by default; a saved profile setting overrides it.
+- **No faked sessions:** live sessions are timed by the **database's own clock** (`now()` in a trigger), not by times the browser sends.
+- **Edits can only reduce XP, never increase it:** XP = the overlap of the edited times with the DB-recorded window, so shrinking a session lowers XP and stretching it adds hours but no XP. Deleting removes its XP.
 
-Not stored, calculated: XP and trainer level (from sessions, `src/lib/xp.ts`), the daily coach (from the date, `src/lib/daily-pokemon.ts`), and which coach trained you on each logged day.
+Not stored, calculated: trainer level (from the sum of `xp_minutes`, curve in `src/lib/xp.ts`), the daily coach (from the date, `src/lib/daily-pokemon.ts`), and which coach trained you on each logged day.
 
 Template for any other table:
 
