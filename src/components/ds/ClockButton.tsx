@@ -27,8 +27,8 @@ export function ClockButton({
 }: Props) {
   const label = running ? "Clock out" : "Clock in";
   const dims = { lg: "h-44 w-44", md: "h-32 w-32", sm: "h-24 w-24" }[size];
-  // The centre button grows on smaller balls so the 12px label still fits.
-  const centre = { lg: "w-[46%] text-sm", md: "w-[54%] text-[12px]", sm: "w-[62%] text-[12px] tracking-normal" }[size];
+  // A big centre button with big text, so the main action reads at a glance.
+  const centre = { lg: "w-[58%] text-xl", md: "w-[64%] text-base", sm: "w-[70%] text-[13px] tracking-normal" }[size];
   return (
     <button
       type={type}
@@ -38,6 +38,11 @@ export function ClockButton({
       className={`group relative ${dims} shrink-0 select-none rounded-full shadow-[0_0_10px_color-mix(in_srgb,var(--dk-red)_45%,transparent),0_0_26px_color-mix(in_srgb,var(--dk-red)_22%,transparent)] transition-[box-shadow,translate,filter] duration-150 hover:shadow-[0_0_8px_var(--dk-red),0_0_28px_color-mix(in_srgb,var(--dk-red)_55%,transparent)] data-[force=hover]:shadow-[0_0_8px_var(--dk-red),0_0_28px_color-mix(in_srgb,var(--dk-red)_55%,transparent)] active:translate-y-0.5 active:brightness-90 data-[force=pressed]:translate-y-0.5 data-[force=pressed]:brightness-90 focus-visible:outline-4 focus-visible:outline-solid focus-visible:outline-offset-4 focus-visible:outline-(--dk-sky) data-[force=focus]:outline-4 data-[force=focus]:outline-solid data-[force=focus]:outline-offset-4 data-[force=focus]:outline-(--dk-sky) disabled:pointer-events-none disabled:grayscale disabled:opacity-50 ${open ? "disabled:grayscale-0 disabled:opacity-100" : ""} ${className}`}
       {...rest}
     >
+      {/* A slow red "breathing" glow so the ball stands out (still for reduced motion). */}
+      <span
+        aria-hidden
+        className={`pointer-events-none absolute -inset-1.5 rounded-full shadow-[0_0_18px_6px_color-mix(in_srgb,var(--dk-red)_45%,transparent)] motion-safe:animate-pulse ${open ? "opacity-0" : ""}`}
+      />
       {/* Light inside the ball, seen when the lid is up. */}
       <span
         aria-hidden
@@ -56,22 +61,16 @@ export function ClockButton({
       </span>
       {/* Centre button with the label; it hides while the ball is open. */}
       <span
-        className={`absolute left-1/2 top-1/2 flex aspect-square -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full border-4 ${ink} bg-(--dk-ball) font-bold uppercase leading-tight tracking-[0.04em] ${centre} text-(--dk-void) transition-[opacity,scale] duration-200 ${open ? "scale-75 opacity-0" : "opacity-100"}`}
+        className={`absolute left-1/2 top-1/2 flex aspect-square -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full border-4 ${ink} bg-(--dk-ball) font-extrabold uppercase leading-[1.05] tracking-[0.03em] ${centre} text-(--dk-void) transition-[opacity,scale] duration-200 ${open ? "scale-75 opacity-0" : "opacity-100"}`}
         style={{ fontFamily: "var(--dp-display)" }}
       >
-        {running ? (
-          <>
-            Clock
-            <br />
-            out
-          </>
-        ) : (
-          <>
-            Clock
-            <br />
-            in
-          </>
-        )}
+        {/* Capitals have no descenders, so the line box leaves empty space under them and
+            they look high. This nudges them down to the optical centre. */}
+        <span className="translate-y-[0.08em]">
+          Clock
+          <br />
+          {running ? "out" : "in"}
+        </span>
       </span>
     </button>
   );
