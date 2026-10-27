@@ -50,6 +50,19 @@ describe("coachLines table", () => {
     }
   });
 
+  it("uses the anime phrases: 'I choose you!' to clock in, 'That's enough' to clock out", () => {
+    for (const type of COACH_TYPES) {
+      for (const line of coachLines[type].clockIn) {
+        expect(line, `${type}.clockIn`).toMatch(/^\{trainer\}, I choose you! /);
+      }
+      for (const line of coachLines[type].clockOut) {
+        expect(line, `${type}.clockOut`).toMatch(/^That's enough, \{trainer\}\. /);
+      }
+      // At least one clock-out line tells the trainer how long they worked.
+      expect(coachLines[type].clockOut.some((line) => line.includes("{hours}h")), type).toBe(true);
+    }
+  });
+
   it("has no duplicate lines inside a type and event", () => {
     for (const type of COACH_TYPES) {
       for (const event of COACH_EVENTS) {
