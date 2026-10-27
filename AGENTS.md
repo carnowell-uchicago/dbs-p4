@@ -43,6 +43,68 @@ The student also has to explain everything in class: request tracing, access con
 
 ---
 
+## Status and next steps (updated 2026-10-27; read this first in a new session)
+
+**Due today, Tuesday Oct 27, 5:30 PM.** Work is on branch `feature/clerk-auth`, pushed to `origin` after every commit. `main` has only the initial setup commit. Plain `git push` works.
+
+**Done so far:**
+- **Step 1:** idea and API chosen (Section 2).
+- **Step 3:** deny rule in `.claude/settings.json`; `.env*` is gitignored.
+- **Step 4 (partly):** `clerk init` ran with app `app_3Kyu70z56nAtnZonNsGQNtTOLgn` ("p4", development keys in `.env.local`). Header Sign in / Sign up / UserButton added. The student signed up. **Not done:**
+  - `src/proxy.ts` is bare `clerkMiddleware()`, so it protects nothing yet. Add `createRouteMatcher` protection for the app's data routes when they exist.
+  - The student still has to check those routes signed out.
+  - The Step 4 "Ask Your Agent" (explain what `clerk init` added, file by file) was postponed by the student until those routes are protected.
+- **Design:** mood board, Dusk design system, font comparison, and the UI library in `src/components/ds/`:
+  - ClockButton (Poké Ball), WatchTimer, TrainerAvatar, TrainerCard, XpBar, CoachCard, TextBox
+  - Segmented, Field, SwatchPicker, Tag/Badge, Skeleton, Button
+- **Logic in `src/lib/` with Vitest tests** (`npm run test:unit`, 72 passing; run `npx next typegen` before `npx tsc --noEmit` on a fresh clone):
+  - `time.ts`, `dates.ts`, `ranges.ts`, `timesheet.ts` (CSV)
+  - `xp.ts`, `daily-pokemon.ts`, `coach-lines.ts`
+  - `pokeapi.ts`
+- **Supabase (in progress, student):** project ref `dxwqwpbtuizagvkawlhl`. `.mcp.json` is committed and scoped to it. The agent fixed a line break that had split the ref.
+
+**Waiting on the student:**
+1. **Supabase setup:**
+   - Restart Claude Code, run `/mcp`, and log in to **supabase**. Check that its tools load before doing any database work.
+   - Clerk Dashboard → Supabase integration → Activate, then copy the Clerk domain into Supabase → Authentication → Sign In / Providers → Third-Party Auth → Clerk.
+   - Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` to `.env.local`.
+2. **Approve the data model** (Section 2). Ask whether they want tags or notes on sessions.
+3. **Confirm assumptions:**
+   - the coach changes at midnight `America/Chicago` (`DAILY_EPOCH` 2026-10-27);
+   - XP curve: 1 XP per minute, level n→n+1 costs 100·n;
+   - the coach's tone: the 8 h lines suggest winding down; check a few in `coach-lines.ts`;
+   - server-side PokéAPI (Step 6).
+
+**Next for the agent, in order** (one step at a time, stop after each per Section 0):
+- **Step 5:** migrations through the Supabase MCP, RLS on both tables, run the security advisors.
+  - Supabase client using Clerk's token: `accessToken: async () => (await auth()).getToken()` on the server, or `session?.getToken()` on the client.
+  - Then the "Ask Your Agent" RLS explanation.
+- **App screens (Dusk components):**
+  - Dashboard: today's coach + text box, the Poké Ball clock button + watch timer, trainer card with level/XP, today's sessions.
+  - Profile / avatar editor.
+  - Log page: 1w / 2w / custom with a start-or-end anchor, a table, CSV download.
+  - Use the tall-grass background on app pages. Restyle the global header in `src/app/layout.tsx`, which is still the default white.
+  - **Remote images:** add `raw.githubusercontent.com` to `next.config.ts` `images.remotePatterns`, or use `unoptimized`.
+  - **States:** loading, empty and API-down for the coach. Clocking in must never depend on PokéAPI.
+- **Step 4 finish:** protect the routes in `proxy.ts`; the student checks them signed out.
+- **Step 7:**
+  - One Playwright test with `@clerk/testing`: two users each save something, and neither can see the other's. The student creates the test users and their env vars.
+  - **The student breaks RLS and watches it fail**, then it's fixed and passes. Save the failing output.
+  - Chromium is already installed in `~/Library/Caches/ms-playwright`.
+- **Step 8:**
+  - The student runs `/security-review` on the branch and reads the diffs; findings get handled.
+  - The student merges, deploys on Vercel (Hobby) with env vars set, and has a classmate use it.
+  - Write `README.md` (it's still the create-next-app default).
+- Fill in the Vercel URL in Section 2 and keep the **Agentic workflow log** (Section 6) current.
+
+**Dev notes:**
+- `npm run dev` serves on :3000.
+- Next 16 has `cacheComponents: true`, so anything that reads auth or request data must sit inside `<Suspense>`, or the build fails. That's why the layout's auth controls and the sign-in/up pages are wrapped.
+- Screenshots and Playwright scratch scripts go in the session scratchpad, not the repo.
+- Stage explicit paths when committing; `.claude/worktrees/` is ignored.
+
+---
+
 ## 1. Requirements checklist (all are graded)
 
 - [ ] **Accounts:** sign up, sign in, and sign out with Clerk. A signed-out visitor sees no one's data.
@@ -74,9 +136,9 @@ The student also has to explain everything in class: request tracing, access con
   - **Timesheet export:** generate a log for **1 week**, **2 weeks**, or a **custom** range. The user picks **either the start or the end date**, and the other end is calculated.
 - **Theme decision (2026-10-27): design the dusk direction (B) first.** Clock in is red, like the watch button and/or a Poké Ball. Pixel font must be a Google Font; the student chose **Silkscreen** after comparing ten on `/design/fonts` (Pixelify Sans made 5 and S look alike).
 - **Background (2026-10-27):** the student asked for a dark tall-grass background instead of plain black: `src/components/ds/textures.ts` (pixel tile under a 45% navy wash; text still passes AA on the brightest blade).
-- **Theme:** a spinoff of **Neon Arcade** (from `~/projects/p2`, tokens in `src/components/ds/neon-arcade/tokens.ts`) using **Pokémon Diamond/Pearl daytime colours**. Process: **mood board first (`/design/mood-board`), then a design system**. The student approves each before any app UI is built on them.
+- **Theme: "Dusk"**, a spinoff of **Neon Arcade** (the student's Assignment 2, `~/projects/p2`, tokens in `src/components/ds/neon-arcade/tokens.ts`) using Pokémon Diamond/Pearl colours. Mood board at `/design/mood-board` (daytime research; dusk was chosen afterwards), design system at `/design/system`, font comparison at `/design/fonts`. **The app UI must be built from `src/components/ds/`** (tokens in `tokens.ts`, background in `textures.ts`, fonts in `fonts.ts`); don't invent new colours. Watch red (`--dk-red`) is the only accent and only the Clock in/out control wears it. The student hasn't yet given a final OK on the design system; ask for feedback on anything new.
 - **Extending Assignment 3, or starting new?** Starting a new project.
-- **External API:** PokéAPI, `https://pokeapi.co/api/v2/`. No key needed. Read-only (GET). Specific endpoints are TBD until the tool idea is chosen.
+- **External API:** PokéAPI, `https://pokeapi.co/api/v2/`. No key needed. Read-only (GET). Endpoints used: `/pokemon/{id}`, `/pokemon-species/{id}`, `/pokemon?limit=151` (see `src/lib/pokeapi.ts`).
 - **Sample response notes** (checked 2026-10-20):
   - `GET /pokemon/{name|id}` returns about 300 KB of JSON: `id`, `name`, `height` (decimetres), `weight` (hectograms), `types[]`, `abilities[]`, `stats[]` (hp/attack/defense/sp-atk/sp-def/speed), `sprites` (PNG URLs, including `other.official-artwork`), `cries` (`.ogg` URLs), `moves[]` (100+ entries), and `species` (a link to the `/pokemon-species` endpoint).
   - `GET /pokemon-species/{name|id}` returns `flavor_text_entries` (Pokédex text, many languages and versions; contains `\n` and `\f` that need cleaning), `genera`, `is_legendary`/`is_mythical`, `habitat`, `color`, `evolution_chain` (link), and `generation`.
@@ -85,7 +147,7 @@ The student also has to explain everything in class: request tracing, access con
   - Other resources: types, moves, abilities, items, berries, evolution chains, locations, regions, generations, natures, and Pokédexes.
   - **Images:** `sprites` holds URLs on `raw.githubusercontent.com/PokeAPI/sprites/…`. Use `front_default` (~0.6 KB pixel sprite, good for lists) or `other.official-artwork.front_default` (~118 KB, good for detail views). Store only the URL or the Pokémon ID, not the image. If you use `next/image`, add `raw.githubusercontent.com` to `images.remotePatterns`. Show the Nintendo trademark credit in the footer.
   - **PokéAPI fair use policy:** "Locally cache resources whenever you request them". Repeated calls get your IP permanently banned. Cache every PokéAPI response (the data almost never changes), and never call it in a loop without caching.
-- **Where the API is called (browser vs. server) and why:** _TBD (Step 6)_
+- **Where the API is called (browser vs. server) and why:** _Not formally decided yet (Step 6)._ `src/lib/pokeapi.ts` is built server-only (`import "server-only"`, `"use cache"` + `cacheLife("max")`, 8 s timeout, `PokemonNotFoundError` vs `PokeApiUnavailableError`), because of the fair-use caching rule, 300 KB responses, and one place for errors. Have the student confirm this and the reason. Open question: in-memory `"use cache"` may not persist on Vercel serverless (acceptable at this traffic).
 - **GitHub repo URL:** https://github.com/carnowell-uchicago/dbs-p4 (remote `origin`)
 - **Vercel URL:** _TBD_
 
@@ -93,7 +155,29 @@ The student also has to explain everything in class: request tracing, access con
 
 > **Write this in Step 2 and get the student's approval before building anything that touches the database.** Keep it small (usually 2–3 tables). Every table that holds a person's data has a `user_id` column.
 
-_TBD. Use this format for each table:_
+**Proposed by the agent, NOT yet approved by the student** (ask before creating anything):
+
+```
+profiles
+  user_id       text primary key default (auth.jwt() ->> 'sub')   -- Clerk user ID
+  trainer_name  text not null
+  avatar        jsonb not null   -- { skin, hair, hairColor, hat, hatColor, outfit } (see TrainerAvatar.tsx)
+  timezone      text not null default 'America/Chicago'   -- IANA zone, used to group hours by day
+  created_at    timestamptz not null default now()
+work_sessions
+  id            uuid primary key default gen_random_uuid()
+  user_id       text not null default (auth.jwt() ->> 'sub')
+  clock_in      timestamptz not null
+  clock_out     timestamptz            -- null while running; check clock_out > clock_in
+  note          text
+  created_at    timestamptz not null default now()
+  + unique partial index: one running session per user (where clock_out is null)
+RLS: enabled on both; select/insert/update/delete only where user_id = (auth.jwt() ->> 'sub')
+```
+
+Not stored, calculated: XP and trainer level (from sessions, `src/lib/xp.ts`), the daily coach (from the date, `src/lib/daily-pokemon.ts`), and which coach trained you on each logged day.
+
+Template for any other table:
 
 ```
 table_name
@@ -112,7 +196,7 @@ Policies: select/insert/update/delete only where user_id = (auth.jwt() ->> 'sub'
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | yes (publishable) | browser + server |
 | `CLERK_SECRET_KEY` | **no, server only** | server |
 | `NEXT_PUBLIC_SUPABASE_URL` | yes | browser + server |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (or `..._ANON_KEY`) | yes (publishable) | browser + server |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (`sb_publishable_…`, from Project Settings → API Keys) | yes (publishable) | browser + server |
 | Playwright test-user credentials (e.g. `E2E_USER1_EMAIL`, `E2E_USER1_PASSWORD`, `E2E_USER2_...`) | **no** | tests only |
 | External API key (only if the chosen API needs one) | **no, server only** | server |
 
@@ -240,6 +324,11 @@ To help with #5, keep a short running log below. Record each time the student re
 - 2026-10-27: The student asked for **more real gameplay images** on the mood board. Bulbagarden blocks automated downloads; the agent did not try to get around that and used Wikipedia/Commons instead (4 more references).
 - 2026-10-27: The student asked the agent to **use subagents for background work** while the design is still open. The agent kept decision-dependent work (data model, database, UI) out of it and launched two worktree agents: pure time/XP/daily-Pokémon logic with tests, and a cached server-side PokéAPI module.
 - 2026-10-27: Agent mistake, caught by the agent and fixed: a `git add -A` picked up the agents' `.claude/worktrees/` folders (gitlinks only, no file contents). Fixed forward in a new commit (no history rewrite), and the folder is now in `.gitignore`. **Lesson: stage explicit paths while worktrees exist.**
+- 2026-10-27: The student **reworked the core idea** mid-build: the user is the trainer who earns XP, with a customizable avatar, and the daily Pokémon is a coach that talks in type-based text boxes. This replaced the agent-built "active Pokémon earns XP" plan.
+- 2026-10-27: The student chose the **dusk** direction and a **red Poké Ball** Clock in button. They then rejected the pixel font the agent had picked (Pixelify Sans) as hard to read. The agent built a 10-font comparison, found that Pixelify and Tiny5 make 5 and S look alike ("7.5" reads as "7.S"), and the student picked **Silkscreen**.
+- 2026-10-27: The student asked for a **tall-grass background** instead of plain dark. The agent's first tile had a bug (all four quadrants were identical, so there was no offset), which the agent caught and fixed. It also checked text contrast against the brightest blade.
+- 2026-10-27: The student set up the Supabase MCP. The agent caught a **line break splitting the project ref** in `.mcp.json`, which would have stopped it connecting, and fixed it.
+- 2026-10-27: Agent slip: moving `fonts.ts` left the new copy staged, so it landed in an unrelated commit ("Rework the idea…"). The next commit removed the old copy; history was left as is.
 
 ---
 
