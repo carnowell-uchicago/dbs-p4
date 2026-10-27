@@ -22,7 +22,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         className="flex min-h-full flex-col bg-(--dk-void) text-(--dk-ice) selection:bg-(--dk-sky) selection:text-(--dk-void)"
         style={{ ...paletteVars, ...grassBackground, fontFamily: "var(--dp-body)" }}
       >
-        <ClerkProvider>
+        <ClerkProvider signInFallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
           <TimeZoneCookie />
           <header className="border-b-2 border-(--dk-edge) bg-(--dk-panel)">
             <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:gap-4 sm:px-6">

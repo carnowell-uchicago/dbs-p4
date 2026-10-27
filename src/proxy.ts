@@ -1,4 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
 // Every page that shows someone's data. Signed-out visitors are sent to sign in.
 // Server Actions post to these same paths, so they're covered too, and each
@@ -7,6 +8,13 @@ const isPrivateRoute = createRouteMatcher(["/dashboard(.*)", "/pokedex(.*)", "/l
 
 export default clerkMiddleware(async (auth, req) => {
   if (isPrivateRoute(req)) await auth.protect();
+
+  // Signed in already? Skip the front page and go straight to the dashboard.
+  // (Brand-new users land there too, where they name their trainer first.)
+  if (req.nextUrl.pathname === "/") {
+    const { userId } = await auth();
+    if (userId) return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
 });
 
 export const config = {
