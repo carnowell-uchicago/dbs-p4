@@ -18,9 +18,9 @@ export function msOnDay(session: WorkSession, dateKey: string, timeZone: string,
 
 export function TodaySessions({ sessions, timeZone, today, now }: { sessions: WorkSession[]; timeZone: string; today: string; now: Date }) {
   return (
-    <section aria-labelledby="today-h" className="rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) p-4">
+    <section aria-labelledby="today-h" className="rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) neon-panel p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 id="today-h" className="text-sm font-bold uppercase tracking-[0.08em]" style={{ fontFamily: "var(--dp-display)" }}>
+        <h2 id="today-h" className="neon-text text-sm font-bold uppercase tracking-[0.08em]" style={{ fontFamily: "var(--dp-display)" }}>
           Today · {formatDay(today)}
         </h2>
         <Link

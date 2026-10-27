@@ -10,7 +10,7 @@ import { addManualSession, type ActionResult } from "./actions";
 export function AddTimeForm({ today }: { today: string }) {
   const [result, formAction, pending] = useActionState<ActionResult, FormData>(addManualSession, null);
   return (
-    <details className="group rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) p-4">
+    <details className="group rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) neon-panel p-4">
       <summary
         className="cursor-pointer select-none text-sm font-bold uppercase tracking-[0.08em] text-(--dk-diamond) focus-visible:outline-3 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-(--dk-sky)"
         style={{ fontFamily: "var(--dp-display)" }}

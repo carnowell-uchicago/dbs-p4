@@ -20,7 +20,7 @@ export function TrainerCard({
   return (
     <section
       aria-label={`Trainer ${name}`}
-      className="flex items-center gap-4 rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) p-4"
+      className="flex items-center gap-4 rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) neon-panel p-4"
     >
       <div className="rounded-(--dk-r-md) border-2 border-(--dk-line) bg-(--dk-void) p-2">
         <TrainerAvatar avatar={avatar} size={56} />

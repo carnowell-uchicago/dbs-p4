@@ -14,7 +14,7 @@ import { LandingClockDemo } from "./LandingClockDemo";
 const display = { fontFamily: "var(--dp-display)" };
 const mono = { fontFamily: "var(--dp-mono)" };
 
-export const panel = "rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel)";
+export const panel = "rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) neon-panel";
 export const PIKACHU = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-iv/diamond-pearl/25.png";
 
 /** Sign up when signed out; straight to the dashboard when signed in. */
@@ -84,7 +84,7 @@ export function ProductSplit() {
       <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
         <div className="space-y-6">
           <Eyebrow>For remote workers and students</Eyebrow>
-          <h1 className="text-4xl font-bold uppercase leading-[1.05] tracking-[0.05em] sm:text-5xl" style={display}>
+          <h1 className="neon-text text-4xl font-bold uppercase leading-[1.05] tracking-[0.05em] sm:text-5xl" style={display}>
             Your hours,
             <br />
             logged in one press.

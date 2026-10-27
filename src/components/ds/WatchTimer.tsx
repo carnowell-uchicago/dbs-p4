@@ -10,12 +10,12 @@ type Props = {
 export function WatchTimer({ elapsed, caption, running }: Props) {
   const [hm, seconds] = [elapsed.slice(0, 5), elapsed.slice(5)];
   return (
-    <div className="rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-[#05070d] p-2">
+    <div className="neon-panel rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-[#05070d] p-2">
       <div
         role="timer"
         aria-live="off"
         aria-label={`${running ? "On the clock" : "Off the clock"}: ${elapsed}, ${caption}`}
-        className="rounded-[6px] bg-(--dk-lcd) px-4 py-3 text-(--dk-lcd-ink)"
+        className="rounded-[6px] bg-(--dk-lcd) px-4 py-3 text-(--dk-lcd-ink) shadow-[0_0_14px_color-mix(in_srgb,var(--dk-lcd)_55%,transparent),inset_0_0_10px_rgb(0_0_0/0.25)]"
         style={{
           backgroundImage:
             "repeating-linear-gradient(0deg, #1f3a1c14 0 1px, transparent 1px 4px), repeating-linear-gradient(90deg, #1f3a1c14 0 1px, transparent 1px 4px)",

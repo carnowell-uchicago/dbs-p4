@@ -24,7 +24,7 @@ export function BattleScene({
   line: ReactNode; // what the coach says
 }) {
   return (
-    <section aria-label="Battle" className="overflow-hidden rounded-(--dk-r-lg) border-2 border-(--dk-edge)">
+    <section aria-label="Battle" className="neon-panel overflow-hidden rounded-(--dk-r-lg) border-2 border-(--dk-edge)">
       <div className="relative" style={{ background: "linear-gradient(#0b1130, #1d2758 55%, #2a3466)" }}>
         {/* Grass on the lower part of the field. */}
         <div
@@ -82,7 +82,7 @@ export function NamePlate({
 }) {
   const corner = side === "opponent" ? "rounded-[6px] rounded-br-[22px]" : "rounded-[6px] rounded-tl-[22px]";
   return (
-    <div className={`border-[3px] border-[#05070d] bg-(--dk-ball) px-4 py-2.5 text-(--dk-void) shadow-[0_0_0_2px_var(--dk-edge)] ${corner}`}>
+    <div className={`border-[3px] border-[#05070d] bg-(--dk-ball) px-4 py-2.5 text-(--dk-void) neon-frame ${corner}`}>
       <div className="flex items-baseline justify-between gap-3">
         <p className="truncate text-base font-bold uppercase tracking-[0.06em]" style={display}>
           {name}
@@ -113,7 +113,7 @@ export function PlateBar({ label, fill, colour, caption }: { label: string; fill
           aria-valuemax={100}
           className="h-2.5 flex-1 overflow-hidden rounded-full border-2 border-[#05070d] bg-[#2a3466]"
         >
-          <span className="block h-full transition-[width] duration-500" style={{ width: `${pct}%`, background: colour }} />
+          <span className="block h-full transition-[width] duration-500" style={{ width: `${pct}%`, background: colour, boxShadow: `0 0 8px ${colour}` }} />
         </span>
       </div>
       <p className="text-right text-xs tabular-nums" style={mono}>
@@ -135,17 +135,18 @@ export function shiftHp(todayMs: number): { fill: number; colour: string } {
 export function CoachFromBehind({ name, types, sprite }: { name: string; types: string[]; sprite: string | null }) {
   return (
     <div className="flex flex-col items-start gap-1">
-      {/* The text box already names the coach, so on phones this label is for screen readers only. */}
+      {/* Decorative label (the image's alt text names the coach for screen readers); hidden on
+          phones, where the text box already shows who's talking. */}
       <span
-        className="sr-only rounded-(--dk-r-sm) border-2 border-(--dk-gold) bg-(--dk-void)/80 px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.08em] text-(--dk-gold) sm:not-sr-only"
+        aria-hidden
+        className="mb-1 hidden rounded-(--dk-r-md) border-2 border-(--dk-gold) bg-(--dk-void)/85 px-3 py-1.5 text-xs font-bold uppercase leading-none tracking-[0.1em] text-(--dk-gold) shadow-[0_0_10px_color-mix(in_srgb,var(--dk-gold)_45%,transparent)] [text-shadow:0_0_6px_color-mix(in_srgb,var(--dk-gold)_60%,transparent)] sm:inline-block"
         style={display}
       >
         Coach · {name}
-        {types.length > 0 && <span className="sr-only"> ({types.join(", ")} type)</span>}
       </span>
       {sprite ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={sprite} alt={`${name}, today's coach, seen from behind`} width={176} height={176} className="size-24 [image-rendering:pixelated] sm:size-44" />
+        <img src={sprite} alt={`${name}${types.length ? ` (${types.join(", ")} type)` : ""}, today's coach, seen from behind`} width={176} height={176} className="size-24 [image-rendering:pixelated] sm:size-44" />
       ) : (
         <span aria-label="Today's coach is unavailable" role="img" className="flex size-24 items-center justify-center text-6xl text-(--dk-muted) sm:size-44" style={display}>
           ?

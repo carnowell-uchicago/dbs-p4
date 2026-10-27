@@ -17,7 +17,7 @@ const mono = { fontFamily: "var(--dp-mono)" };
 export default function LogPage({ searchParams }: PageProps<"/log">) {
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 print:max-w-none print:p-0">
-      <h1 className="mb-4 text-2xl font-bold uppercase tracking-[0.06em]" style={{ fontFamily: "var(--dp-display)" }}>
+      <h1 className="neon-text mb-4 text-2xl font-bold uppercase tracking-[0.06em] print:[text-shadow:none]" style={{ fontFamily: "var(--dp-display)" }}>
         Timesheet
       </h1>
       <Suspense fallback={<Skeleton className="h-96 w-full" />}>
@@ -80,7 +80,7 @@ async function Timesheet({ searchParams }: { searchParams: PageProps<"/log">["se
         </TextBox>
       )}
 
-      <section aria-labelledby="sheet-h" className="rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) p-4 print:border-0 print:p-0">
+      <section aria-labelledby="sheet-h" className="rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) neon-panel p-4 print:border-0 print:p-0">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 id="sheet-h" className="text-lg font-bold" style={{ fontFamily: "var(--dp-display)" }}>

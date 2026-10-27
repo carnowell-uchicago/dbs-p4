@@ -86,6 +86,8 @@ export function ClockPanel({
       stage={<ClockStage out={out} avatar={avatar} name={trainerName} disabled={pending} onClick={press} aria-busy={pending} />}
       playerPlate={
         <NamePlate name={trainerName} tag={`Lv ${level.level}`} side="player">
+          {/* Like the games: your HP sits above your XP. You never take damage here, so it stays full. */}
+          <PlateBar label="HP" fill={1} colour="var(--dk-hp)" caption="100 / 100" />
           <PlateBar
             label="XP"
             fill={level.progress}

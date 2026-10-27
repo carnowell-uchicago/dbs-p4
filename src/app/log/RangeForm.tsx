@@ -12,7 +12,7 @@ export function RangeForm({ preset, anchor, date, days, today }: { preset: strin
   const [length, setLength] = useState(preset);
   const [which, setWhich] = useState(anchor);
   return (
-    <form method="get" className="flex flex-wrap items-end gap-4 rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) p-4 print:hidden">
+    <form method="get" className="flex flex-wrap items-end gap-4 rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) neon-panel p-4 print:hidden">
       <Segmented
         label="Length"
         name="preset"

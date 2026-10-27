@@ -40,7 +40,7 @@ export function DeleteSessionButton({
       <dialog
         ref={dialog}
         aria-labelledby={`del-${sessionId}`}
-        className="m-auto w-[min(28rem,calc(100vw-2rem))] rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) p-5 text-(--dk-ice) backdrop:bg-[#05070d]/70"
+        className="m-auto w-[min(28rem,calc(100vw-2rem))] rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) neon-panel p-5 text-(--dk-ice) backdrop:bg-[#05070d]/70"
       >
         <h2 id={`del-${sessionId}`} className="text-sm font-bold uppercase tracking-[0.08em]" style={{ fontFamily: "var(--dp-display)" }}>
           Delete this session?

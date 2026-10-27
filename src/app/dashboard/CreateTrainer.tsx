@@ -10,7 +10,7 @@ import { createProfile, type ActionResult } from "./actions";
 export function CreateTrainer() {
   const [result, formAction, pending] = useActionState<ActionResult, FormData>(createProfile, null);
   return (
-    <section className="mx-auto flex max-w-md flex-col gap-4 rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) p-6">
+    <section className="mx-auto flex max-w-md flex-col gap-4 rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) neon-panel p-6">
       <TextBox speaker="Prof. Willow">Welcome! Before your first shift, what should your coaches call you?</TextBox>
       <form action={formAction} className="flex flex-col gap-3">
         <Field label="Trainer name" name="trainerName" required minLength={1} maxLength={40} autoComplete="nickname" error={result && !result.ok ? result.message : undefined} />

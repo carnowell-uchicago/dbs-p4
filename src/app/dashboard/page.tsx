@@ -106,11 +106,11 @@ async function Dashboard() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) px-4 py-3">
+    <div className="rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) neon-panel px-4 py-3">
       <dt className="text-xs font-bold uppercase tracking-[0.08em] text-(--dk-muted)" style={{ fontFamily: "var(--dp-mono)" }}>
         {label}
       </dt>
-      <dd className="mt-1 text-lg font-bold tabular-nums sm:text-xl" style={{ fontFamily: "var(--dp-display)" }}>
+      <dd className="neon-text mt-1 text-lg font-bold tabular-nums sm:text-xl" style={{ fontFamily: "var(--dp-display)" }}>
         {value}
       </dd>
     </div>

@@ -29,7 +29,7 @@ export function TextBox({
   return (
     <div
       role={live === "assertive" ? "alert" : live ? "status" : undefined}
-      className="flex overflow-hidden rounded-(--dk-r-md) border-[3px] border-[#05070d] bg-(--dk-ball) text-(--dk-void) shadow-[0_0_0_2px_var(--dk-edge)]"
+      className="flex overflow-hidden rounded-(--dk-r-md) border-[3px] border-[#05070d] bg-(--dk-ball) text-(--dk-void) neon-frame"
     >
       <span aria-hidden className={`w-2 shrink-0 ${bars[tone]}`} />
       <div className="min-w-0 flex-1 px-4 py-3">

@@ -27,6 +27,8 @@ export function BattleDemo({ avatar }: { avatar: Avatar }) {
       stage={<ClockStage out={out} avatar={avatar} name="Alex" onClick={() => setOut((v) => !v)} />}
       playerPlate={
         <NamePlate name="Alex" tag="Lv 4" side="player">
+          {/* Like the games: your HP sits above your XP. You never take damage here, so it stays full. */}
+          <PlateBar label="HP" fill={1} colour="var(--dk-hp)" caption="100 / 100" />
           <PlateBar label="XP" fill={210 / 400} colour="var(--dk-hp)" caption="210 / 400 XP" />
         </NamePlate>
       }

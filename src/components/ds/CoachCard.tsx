@@ -22,7 +22,7 @@ export function CoachCard({
   return (
     <section
       aria-label={`Today's coach: ${name}`}
-      className="overflow-hidden rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel)"
+      className="overflow-hidden rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel) neon-panel"
     >
       <div
         className="relative flex items-end gap-4 px-4 pb-3 pt-4"

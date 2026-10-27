@@ -21,7 +21,7 @@ export function XpBar({
         className="h-3 flex-1 rounded-(--dk-r-sm) border-2 border-(--dk-edge) bg-(--dk-void)"
       >
         <div
-          className={`h-full rounded-[1px] ${pct >= 100 ? "bg-(--dk-gold)" : "bg-(--dk-hp)"}`}
+          className={`h-full rounded-[1px] ${pct >= 100 ? "bg-(--dk-gold) shadow-[0_0_8px_var(--dk-gold)]" : "bg-(--dk-hp) shadow-[0_0_8px_var(--dk-hp)]"}`}
           style={{ width: `${pct}%` }}
         />
       </div>

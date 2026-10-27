@@ -24,14 +24,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       >
         <ClerkProvider signInFallbackRedirectUrl="/dashboard" signUpFallbackRedirectUrl="/dashboard">
           <TimeZoneCookie />
-          <header className="border-b-2 border-(--dk-edge) bg-(--dk-panel) print:hidden">
+          <header className="border-b-2 border-(--dk-edge) bg-(--dk-panel) shadow-[0_2px_16px_color-mix(in_srgb,var(--dk-sky)_28%,transparent)] print:hidden">
             <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:gap-4 sm:px-6">
               <Link
                 href="/"
-                className={`flex items-center gap-2 whitespace-nowrap rounded-(--dk-r-sm) text-xs font-bold uppercase tracking-[0.08em] sm:text-sm ${focusRing}`}
+                className={`neon-text flex items-center gap-2 whitespace-nowrap rounded-(--dk-r-sm) text-xs font-bold uppercase tracking-[0.08em] sm:text-sm ${focusRing}`}
                 style={{ fontFamily: "var(--dp-display)" }}
               >
-                <span aria-hidden className="inline-block size-3 rounded-full border-2 border-[#05070d] bg-(--dk-red)" />
+                <span aria-hidden className="inline-block size-3 rounded-full border-2 border-[#05070d] bg-(--dk-red) shadow-[0_0_8px_var(--dk-red)]" />
                 Trainer Timesheet
               </Link>
               <Suspense fallback={<div className="h-9 w-40" aria-hidden />}>
