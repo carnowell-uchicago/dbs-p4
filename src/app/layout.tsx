@@ -11,8 +11,8 @@ import { TimeZoneCookie } from "@/components/TimeZoneCookie";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Trainer Timesheet",
-  description: "Log your work hours, earn trainer XP, and get coached by a new Pokémon every day.",
+  title: "Trainer Timesheet: log your work hours",
+  description: "A work-hours tracker: clock in and out, see daily and weekly totals, and export a timesheet. Themed as a Pokémon game.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
