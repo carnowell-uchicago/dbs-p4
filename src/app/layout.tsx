@@ -25,10 +25,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ClerkProvider>
           <TimeZoneCookie />
           <header className="border-b-2 border-(--dk-edge) bg-(--dk-panel)">
-            <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+            <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:gap-4 sm:px-6">
               <Link
                 href="/"
-                className={`flex items-center gap-2 rounded-(--dk-r-sm) text-sm font-bold uppercase tracking-[0.08em] ${focusRing}`}
+                className={`flex items-center gap-2 whitespace-nowrap rounded-(--dk-r-sm) text-xs font-bold uppercase tracking-[0.08em] sm:text-sm ${focusRing}`}
                 style={{ fontFamily: "var(--dp-display)" }}
               >
                 <span aria-hidden className="inline-block size-3 rounded-full border-2 border-[#05070d] bg-(--dk-red)" />

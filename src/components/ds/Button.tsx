@@ -9,7 +9,7 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-(--dk-r-md) border-2 font-bold uppercase tracking-[0.08em] transition-[background-color,border-color,color,box-shadow,translate] duration-150 select-none";
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-(--dk-r-md) border-2 font-bold uppercase tracking-[0.08em] transition-[background-color,border-color,color,box-shadow,translate] duration-150 select-none";
 
 const sizes = {
   md: "h-11 min-w-28 px-5 text-sm",

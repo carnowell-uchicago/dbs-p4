@@ -1,24 +1,20 @@
 // Three directions for the front page, all built from the Dusk components.
 // The chosen one moves to src/app/page.tsx; this file is for comparing.
-import { Show, SignInButton, SignUpButton } from "@clerk/nextjs";
-import Link from "next/link";
-import { Suspense, type ReactNode } from "react";
+import { Show, SignUpButton } from "@clerk/nextjs";
+import { Suspense } from "react";
 import { Button } from "@/components/ds/Button";
-import { focusRing } from "@/components/ds/classes";
 import { ClockStageDemo } from "@/components/ds/ClockStageDemo";
-import { CoachCard } from "@/components/ds/CoachCard";
 import { TypeTag } from "@/components/ds/Tag";
 import { TextBox } from "@/components/ds/TextBox";
 import { avatarOptions, defaultAvatar, TrainerAvatar, type Avatar } from "@/components/ds/TrainerAvatar";
 import { TrainerCard } from "@/components/ds/TrainerCard";
-import { WatchTimer } from "@/components/ds/WatchTimer";
+import { Eyebrow, panel, PIKACHU, PrivacyNote, StartCta } from "@/components/Landing";
+export { ProductSplit as OptionProductSplit } from "@/components/Landing";
 
 const display = { fontFamily: "var(--dp-display)" };
 const mono = { fontFamily: "var(--dp-mono)" };
 const pixel = { fontFamily: "var(--dp-pixel)" };
 
-const panel = "rounded-(--dk-r-lg) border-2 border-(--dk-edge) bg-(--dk-panel)";
-const PIKACHU = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-iv/diamond-pearl/25.png";
 
 const trainers: Avatar[] = [
   { skin: avatarOptions.skin[4], hair: "long", hairColor: avatarOptions.hairColor[0], hat: "none", hatColor: avatarOptions.color[0], outfit: avatarOptions.color[3] },
@@ -27,65 +23,12 @@ const trainers: Avatar[] = [
   { skin: avatarOptions.skin[2], hair: "short", hairColor: avatarOptions.hairColor[2], hat: "beanie", hatColor: avatarOptions.color[2], outfit: avatarOptions.color[5] },
 ];
 
-/** Sign up when signed out; straight to the dashboard when signed in. */
-export function StartCta({
-  label = "Start training",
-  secondary = true,
-  centred = false,
-}: {
-  label?: string;
-  secondary?: boolean;
-  centred?: boolean;
-}) {
-  return (
-    <Suspense fallback={<div className="h-11" aria-hidden />}>
-      <div className={`flex flex-wrap items-center gap-3 ${centred ? "justify-center" : ""}`}>
-        <Show when="signed-out">
-          <SignUpButton>
-            <Button className="min-w-44">{label}</Button>
-          </SignUpButton>
-          {secondary && (
-            <SignInButton>
-              <Button variant="ghost">I already have an account</Button>
-            </SignInButton>
-          )}
-        </Show>
-        <Show when="signed-in">
-          <Link
-            href="/dashboard"
-            className={`inline-flex h-11 items-center rounded-(--dk-r-md) border-2 border-(--dk-edge) px-5 text-sm font-bold uppercase tracking-[0.08em] hover:border-(--dk-sky) hover:bg-(--dk-raised) ${focusRing}`}
-            style={display}
-          >
-            Go to your dashboard →
-          </Link>
-        </Show>
-      </div>
-    </Suspense>
-  );
-}
-
-function Eyebrow({ children }: { children: ReactNode }) {
-  return (
-    <p className="text-xs font-bold uppercase tracking-[0.14em] text-(--dk-gold)" style={mono}>
-      {children}
-    </p>
-  );
-}
-
 const features = [
   { title: "One press", body: "Tap the Poké Ball to clock in. Tap again to clock out. That's the whole job." },
   { title: "Earn XP", body: "Every live minute is 1 XP for your trainer. Added-later time counts as hours, not XP." },
   { title: "Daily coach", body: "A new Pokémon from the original 151 coaches everyone each day, in its own voice." },
   { title: "Timesheets", body: "Export 1 week, 2 weeks, or any range as CSV, ready to send." },
 ];
-
-function PrivacyNote() {
-  return (
-    <TextBox speaker="Prof. Willow">
-      Your hours are yours. Other trainers can never see your sessions, and signed-out visitors see nothing at all.
-    </TextBox>
-  );
-}
 
 // ---------------------------------------------------------------------------
 // A · Title screen: the game's boot screen. The animation is the hero.
@@ -131,74 +74,6 @@ export function OptionTitleScreen() {
         ))}
       </ul>
       <div className="w-full max-w-2xl text-left">
-        <PrivacyNote />
-      </div>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// B · Product split: the classic SaaS hero, with the real UI as the picture.
-// ---------------------------------------------------------------------------
-export function OptionProductSplit() {
-  const day = [
-    { time: "9:00 AM", tone: "coach" as const, line: "ALEX, I choose you! PIKACHU used Charge. Let's spark some focus!" },
-    { time: "11:00 AM", tone: "coach" as const, line: "2 hours without a break! PIKACHU suggests a quick stretch." },
-    { time: "5:00 PM", tone: "levelUp" as const, line: "That's enough, ALEX. 7.5h today, and you reached level 13!" },
-  ];
-  return (
-    <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-      <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-        <div className="space-y-6">
-          <Eyebrow>For remote workers and students</Eyebrow>
-          <h1 className="text-4xl font-bold uppercase leading-[1.05] tracking-[0.05em] sm:text-5xl" style={display}>
-            Your hours,
-            <br />
-            logged in one press.
-          </h1>
-          <p className="max-w-lg text-lg text-(--dk-muted)">
-            A timesheet you&apos;ll actually keep. Clock in with a Poké Ball, get coached by a new Pokémon every day, and level up
-            your trainer as the hours add up.
-          </p>
-          <ul className="space-y-2 text-sm" style={mono}>
-            <li>✓ Live timer, notes on every session</li>
-            <li>✓ Forgot to clock in? Add time later</li>
-            <li>✓ CSV timesheet for any week or range</li>
-          </ul>
-          <StartCta />
-        </div>
-
-        {/* The product as the picture, built from the real components. */}
-        <div className="relative">
-          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-            <div className={`${panel} flex flex-col gap-3 p-4 sm:col-span-2`}>
-              <ClockStageDemo avatar={trainers[1]} autoplay />
-              <WatchTimer elapsed="02:14:09" caption="since 9:00 AM · today 6 h 40 min" running />
-            </div>
-            <CoachCard number={25} name="Pikachu" types={["electric"]} sprite={PIKACHU} dateLabel="Tue, Oct 27" line="ALEX, I choose you! Let's spark some focus!" />
-            <TrainerCard name="Alex" avatar={trainers[1]} level={12} xpIntoLevel={980} xpForNextLevel={1200} progress={980 / 1200} />
-          </div>
-        </div>
-      </div>
-
-      <section aria-labelledby="day-h" className="mt-16">
-        <h2 id="day-h" className="text-sm font-bold uppercase tracking-[0.1em]" style={display}>
-          A day with your coach
-        </h2>
-        <ol className="mt-4 grid gap-4 md:grid-cols-3">
-          {day.map((d) => (
-            <li key={d.time} className="space-y-2">
-              <p className="text-xs text-(--dk-gold)" style={mono}>
-                {d.time}
-              </p>
-              <TextBox tone={d.tone} speaker="Pikachu">
-                {d.line}
-              </TextBox>
-            </li>
-          ))}
-        </ol>
-      </section>
-      <div className="mt-10 max-w-2xl">
         <PrivacyNote />
       </div>
     </div>
