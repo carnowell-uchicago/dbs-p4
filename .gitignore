@@ -38,3 +38,6 @@ Assignment 4.pdf
 .DS_Store
 *.log
 *.pem
+
+# Claude Code agent worktrees (separate checkouts; never commit)
+.claude/worktrees/
