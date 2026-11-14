@@ -158,7 +158,6 @@ async function Timesheet({ searchParams }: { searchParams: PageProps<"/log">["se
                       {length}
                     </span>
                     {end === null && <Badge kind="today">Running</Badge>}
-                    {s.source === "manual" && <Badge kind="new">Manual · no XP</Badge>}
                     {s.note && <span className="basis-full text-(--dk-muted) print:text-black">{s.note}</span>}
                   </div>
                   <div className="print:hidden">

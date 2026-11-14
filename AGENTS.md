@@ -364,6 +364,7 @@ To help with #5, keep a short running log below. Record each time the student re
 - 2026-10-27: Live check after merging edit/delete: the smoke test passed, but the **RLS e2e test broke** because the new Edit pop-ups reuse the labels "Note (optional)"/"Start"/"End" and notes now appear twice on /log. Selectors only were fixed (scoped to the Add-time form; `.first()` for the user's *own* note); the isolation assertions (`toHaveCount(0)` for the other user's note) are unchanged. Passes live and locally.
 - 2026-10-27: The student asked for a **level-up pop-up on clock-out** with the text "Congratulations, you reached level [x]. You're now a cog in the machine!". The clock-out action compares total XP (computed by the database) before and after, so the browser can't fake it.
 - 2026-10-27: Agent slip: moving `fonts.ts` left the new copy staged, so it landed in an unrelated commit ("Rework the idea…"). The next commit removed the old copy; history was left as is.
+- 2026-11-14: The student asked to remove the "Manual · no XP" tag from the timesheet printout, since the printed sheet is a record of hours. Removed from `/log` (screen and print); the dashboard keeps it.
 
 ---
 
